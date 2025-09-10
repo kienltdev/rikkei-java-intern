@@ -21,7 +21,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-    private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,7 +38,12 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "api/warehouse/auth/register").permitAll()
+                        .requestMatchers(
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html"
+                                ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())

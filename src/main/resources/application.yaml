@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: warehouse-system
+
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+
+  jpa:
+      hibernate:
+        ddl-auto: none
+      show-sql: true
+
+
+
+  flyway:
+    enabled: true
+
