@@ -32,4 +32,13 @@ build/
 ### VS Code ###
 .vscode/
 
+# Logs
+*.log
 
+# OS files
+.DS_Store        # macOS
+Thumbs.db        # Windows
+
+# Environment / secrets
+.env
+.env.local
