@@ -2,6 +2,7 @@ package intern.rikkei.warehousesystem.modules.auth.service;
 
 import intern.rikkei.warehousesystem.common.enums.Role;
 import intern.rikkei.warehousesystem.modules.auth.entity.User;
+import intern.rikkei.warehousesystem.modules.auth.mapper.UserMapper;
 import intern.rikkei.warehousesystem.modules.auth.repository.UserRepository;
 import intern.rikkei.warehousesystem.modules.auth.dto.request.RegisterRequest;
 import intern.rikkei.warehousesystem.modules.auth.dto.request.UpdateProfileRequest;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -38,13 +40,7 @@ public class UserServiceImpl implements UserService {
         user.setRole(Role.STAFF);
 
         User savedUser = userRepository.save(user);
-        return new UserResponse(
-            savedUser.getId(),
-                savedUser.getUserName(),
-                savedUser.getFullName(),
-                savedUser.getEmail(),
-                savedUser.getRole()
-        );
+        return userMapper.toUserResponse(savedUser);
     }
 
     @Override
@@ -68,13 +64,7 @@ public class UserServiceImpl implements UserService {
 
         User updatedUser = userRepository.save(user);
 
-        return new UserResponse(
-                updatedUser.getId(),
-                updatedUser.getUserName(),
-                updatedUser.getFullName(),
-                updatedUser.getEmail(),
-                updatedUser.getRole()
-        );
+        return userMapper.toUserResponse(updatedUser);
     }
 
     @Override
@@ -82,13 +72,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
 
-        return new UserResponse(
-                user.getId(),
-                user.getUserName(),
-                user.getFullName(),
-                user.getEmail(),
-                user.getRole()
-        );
+        return userMapper.toUserResponse(user);
     }
 
 }
