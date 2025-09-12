@@ -38,7 +38,7 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "api/warehouse/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/warehouse/auth/register").permitAll()
                         .requestMatchers(
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",

@@ -1,4 +1,4 @@
-package intern.rikkei.warehousesystem.common.constant;
+package intern.rikkei.warehousesystem.constant;
 
 public class ApiConstants {
     private ApiConstants() {}

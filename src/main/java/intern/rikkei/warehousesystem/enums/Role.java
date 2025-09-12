@@ -1,4 +1,4 @@
-package intern.rikkei.warehousesystem.common.enums;
+package intern.rikkei.warehousesystem.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

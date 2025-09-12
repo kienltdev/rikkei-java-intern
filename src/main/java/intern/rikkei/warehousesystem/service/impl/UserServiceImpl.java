@@ -1,12 +1,13 @@
-package intern.rikkei.warehousesystem.modules.auth.service;
+package intern.rikkei.warehousesystem.service.impl;
 
-import intern.rikkei.warehousesystem.common.enums.Role;
-import intern.rikkei.warehousesystem.modules.auth.entity.User;
-import intern.rikkei.warehousesystem.modules.auth.mapper.UserMapper;
-import intern.rikkei.warehousesystem.modules.auth.repository.UserRepository;
-import intern.rikkei.warehousesystem.modules.auth.dto.request.RegisterRequest;
-import intern.rikkei.warehousesystem.modules.auth.dto.request.UpdateProfileRequest;
-import intern.rikkei.warehousesystem.modules.auth.dto.response.UserResponse;
+import intern.rikkei.warehousesystem.enums.Role;
+import intern.rikkei.warehousesystem.entity.User;
+import intern.rikkei.warehousesystem.mapper.UserMapper;
+import intern.rikkei.warehousesystem.repository.UserRepository;
+import intern.rikkei.warehousesystem.dto.request.RegisterRequest;
+import intern.rikkei.warehousesystem.dto.request.UpdateProfileRequest;
+import intern.rikkei.warehousesystem.dto.response.UserResponse;
+import intern.rikkei.warehousesystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse register(RegisterRequest registerRequest) {
-        if(userRepository.existsByUserName(registerRequest.userName())){
+        if(userRepository.existsByUsername(registerRequest.username())){
             throw new IllegalArgumentException("Username already exists");
         }
 
@@ -32,9 +33,8 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = new User();
-        user.setUserName(registerRequest.userName());
-        user.setEmail(registerRequest.email());
-        user.setPassWord(passwordEncoder.encode(registerRequest.passWord()));
+        user.setUsername(registerRequest.username());
+        user.setPassword(passwordEncoder.encode(registerRequest.password()));
         user.setFullName(registerRequest.fullName());
         user.setEmail(registerRequest.email());
         user.setRole(Role.STAFF);
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse updateProfile(String userName, UpdateProfileRequest updateProfileRequest) {
 
-        User user = userRepository.findByUserName(userName)
+        User user = userRepository.findByUsername(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
 
         String newEmail = updateProfileRequest.email();
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getCurrentUser(String userName) {
-        User user = userRepository.findByUserName(userName)
+        User user = userRepository.findByUsername(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
 
         return userMapper.toUserResponse(user);

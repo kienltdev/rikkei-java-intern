@@ -1,4 +1,4 @@
-package intern.rikkei.warehousesystem.modules.auth.dto.request;
+package intern.rikkei.warehousesystem.dto.request;
 
 public record UpdateProfileRequest(String fullName, String email) {
 }

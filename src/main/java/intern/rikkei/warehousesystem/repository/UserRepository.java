@@ -1,6 +1,6 @@
-package intern.rikkei.warehousesystem.modules.auth.repository;
+package intern.rikkei.warehousesystem.repository;
 
-import intern.rikkei.warehousesystem.modules.auth.entity.User;
+import intern.rikkei.warehousesystem.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUserName(String userName);
-    boolean existsByUserName(String userName);
+    Optional<User> findByUsername(String username);
+    boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 }

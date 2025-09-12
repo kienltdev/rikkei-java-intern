@@ -1,6 +1,6 @@
-package intern.rikkei.warehousesystem.common.converter;
+package intern.rikkei.warehousesystem.converter;
 
-import intern.rikkei.warehousesystem.common.enums.Role;
+import intern.rikkei.warehousesystem.enums.Role;
 import jakarta.persistence.AttributeConverter;
 
 public class RoleConverter implements AttributeConverter<Role, Integer> {

@@ -1,10 +1,9 @@
-package intern.rikkei.warehousesystem.modules.auth.controller;
+package intern.rikkei.warehousesystem.controller;
 
-import intern.rikkei.warehousesystem.modules.auth.dto.request.RegisterRequest;
-import intern.rikkei.warehousesystem.modules.auth.dto.request.UpdateProfileRequest;
-import intern.rikkei.warehousesystem.modules.auth.dto.response.UserResponse;
-import intern.rikkei.warehousesystem.modules.auth.entity.User;
-import intern.rikkei.warehousesystem.modules.auth.service.UserService;
+import intern.rikkei.warehousesystem.dto.request.RegisterRequest;
+import intern.rikkei.warehousesystem.dto.request.UpdateProfileRequest;
+import intern.rikkei.warehousesystem.dto.response.UserResponse;
+import intern.rikkei.warehousesystem.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package intern.rikkei.warehousesystem.common.base;
+package intern.rikkei.warehousesystem.entity.audit;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -15,7 +15,7 @@ import java.time.Instant;
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity implements Serializable {
+public abstract class AuditableEntity implements Serializable {
     @CreatedDate
     private Instant createdAt;
 

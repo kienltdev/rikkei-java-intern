@@ -1,8 +1,7 @@
 package intern.rikkei.warehousesystem.exception;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import intern.rikkei.warehousesystem.common.constant.ErrorCodes;
-import intern.rikkei.warehousesystem.common.constant.MessageConstants;
+import intern.rikkei.warehousesystem.constant.ErrorCodes;
+import intern.rikkei.warehousesystem.constant.MessageConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +46,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .code("VALIDATION_ERROR")
-                .message("Dữ liệu đầu vào không hợp lệ")
+                .message("Invalid input data")
                 .path(request.getRequestURI())
                 .details(details)
                 .build();
@@ -62,7 +61,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .code("ILLEGAL_ARGUMENT")
-                .message(ex.getMessage()) // Lấy message từ exception, ví dụ "Username đã tồn tại"
+                .message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
