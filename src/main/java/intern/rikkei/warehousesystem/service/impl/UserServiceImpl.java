@@ -1,7 +1,9 @@
 package intern.rikkei.warehousesystem.service.impl;
 
+import intern.rikkei.warehousesystem.constant.ErrorCodes;
 import intern.rikkei.warehousesystem.enums.Role;
 import intern.rikkei.warehousesystem.entity.User;
+import intern.rikkei.warehousesystem.exception.DuplicateResourceException;
 import intern.rikkei.warehousesystem.mapper.UserMapper;
 import intern.rikkei.warehousesystem.repository.UserRepository;
 import intern.rikkei.warehousesystem.dto.request.RegisterRequest;
@@ -9,6 +11,8 @@ import intern.rikkei.warehousesystem.dto.request.UpdateProfileRequest;
 import intern.rikkei.warehousesystem.dto.response.UserResponse;
 import intern.rikkei.warehousesystem.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,12 +24,15 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final MessageSource messageSource;
 
     @Override
     @Transactional
     public UserResponse register(RegisterRequest registerRequest) {
         if(userRepository.existsByUsername(registerRequest.username())){
-            throw new IllegalArgumentException("Username already exists");
+            String message = messageSource.getMessage("error.username.exists",
+                    new Object[]{registerRequest.username()}, LocaleContextHolder.getLocale());
+            throw new DuplicateResourceException(ErrorCodes.USERNAME_ALREADY_EXISTS, message);
         }
 
         if(userRepository.existsByEmail(registerRequest.email())){
