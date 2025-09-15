@@ -4,6 +4,7 @@ import intern.rikkei.warehousesystem.constant.ErrorCodes;
 import intern.rikkei.warehousesystem.enums.Role;
 import intern.rikkei.warehousesystem.entity.User;
 import intern.rikkei.warehousesystem.exception.DuplicateResourceException;
+import intern.rikkei.warehousesystem.exception.ResourceNotFoundException;
 import intern.rikkei.warehousesystem.mapper.UserMapper;
 import intern.rikkei.warehousesystem.repository.UserRepository;
 import intern.rikkei.warehousesystem.dto.request.RegisterRequest;
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -29,14 +32,17 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse register(RegisterRequest registerRequest) {
+        Locale locale = LocaleContextHolder.getLocale();
         if(userRepository.existsByUsername(registerRequest.username())){
             String message = messageSource.getMessage("error.username.exists",
-                    new Object[]{registerRequest.username()}, LocaleContextHolder.getLocale());
+                    new Object[]{registerRequest.username()}, locale);
             throw new DuplicateResourceException(ErrorCodes.USERNAME_ALREADY_EXISTS, message);
         }
 
         if(userRepository.existsByEmail(registerRequest.email())){
-            throw new IllegalArgumentException("Email already exists");
+            String message = messageSource.getMessage("error.email.exists",
+                    new Object[]{registerRequest.email()}, locale);
+            throw new DuplicateResourceException(ErrorCodes.EMAIL_ALREADY_EXISTS, message);
         }
 
         User user = new User();
@@ -53,15 +59,17 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse updateProfile(String userName, UpdateProfileRequest updateProfileRequest) {
-
+        Locale locale = LocaleContextHolder.getLocale();
+        String userNotFoundMessage = messageSource.getMessage("error.user.notFound", new Object[]{userName}, locale);
         User user = userRepository.findByUsername(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
+                .orElseThrow(() ->  new ResourceNotFoundException(ErrorCodes.USER_NOT_FOUND, userNotFoundMessage));
 
         String newEmail = updateProfileRequest.email();
 
         if(!user.getEmail().equalsIgnoreCase(newEmail)){
             if(userRepository.existsByEmail(updateProfileRequest.email())){
-                throw new IllegalArgumentException("Email already exists");
+                String emailExistsMessage = messageSource.getMessage("error.email.exists", new Object[]{newEmail}, locale);
+                throw new DuplicateResourceException(ErrorCodes.EMAIL_ALREADY_EXISTS, emailExistsMessage);
             }
             user.setEmail(updateProfileRequest.email());
         }
@@ -76,8 +84,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getCurrentUser(String userName) {
+        Locale locale = LocaleContextHolder.getLocale();
+        String message = messageSource.getMessage("error.user.notFound", new Object[]{userName}, locale);
         User user = userRepository.findByUsername(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCodes.USER_NOT_FOUND, message));
 
         return userMapper.toUserResponse(user);
     }

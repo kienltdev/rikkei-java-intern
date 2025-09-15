@@ -1,7 +1,8 @@
 package intern.rikkei.warehousesystem.exception;
 
 public record ErrorDetail(
-        String fieldName,
+        String field,
+        String code,
         String message
 ) {
 }

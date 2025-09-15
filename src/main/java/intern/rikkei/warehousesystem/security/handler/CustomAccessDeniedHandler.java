@@ -3,7 +3,6 @@ package intern.rikkei.warehousesystem.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import intern.rikkei.warehousesystem.constant.ErrorCodes;
 import intern.rikkei.warehousesystem.exception.ApiErrorResponse;
-import intern.rikkei.warehousesystem.exception.ErrorPayload;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,22 +23,20 @@ import java.time.Instant;
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     private final ObjectMapper objectMapper;
     private final MessageSource messageSource;
+    private static final String TRACE_ID_ATTRIBUTE = "traceId";
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
             throws IOException, ServletException {
         String message = messageSource.getMessage("error.accessDenied", null, request.getLocale());
 
-        ErrorPayload errorPayload = ErrorPayload.builder()
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+                .timestamp(Instant.now())
                 .status(HttpStatus.FORBIDDEN.value())
                 .code(ErrorCodes.ACCESS_DENIED)
                 .message(message)
-                .build();
-
-        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
-                .timestamp(Instant.now())
                 .path(request.getRequestURI())
-                .error(errorPayload)
+                .traceId((String) request.getAttribute(TRACE_ID_ATTRIBUTE))
                 .build();
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

@@ -3,7 +3,6 @@ package intern.rikkei.warehousesystem.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import intern.rikkei.warehousesystem.constant.ErrorCodes;
 import intern.rikkei.warehousesystem.exception.ApiErrorResponse;
-import intern.rikkei.warehousesystem.exception.ErrorPayload;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,21 +24,20 @@ import java.time.Instant;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
     private final MessageSource messageSource;
+    private static final String TRACE_ID_ATTRIBUTE = "traceId";
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
         String message = messageSource.getMessage("error.unauthorized", null, request.getLocale());
-        ErrorPayload errorPayload = ErrorPayload.builder()
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .code(ErrorCodes.UNAUTHORIZED)
-                .message(message)
-                .build();
 
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .timestamp(Instant.now())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .code(ErrorCodes.UNAUTHORIZED)
+                .message(message)
                 .path(request.getRequestURI())
-                .error(errorPayload)
+                .traceId((String) request.getAttribute(TRACE_ID_ATTRIBUTE))
                 .build();
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

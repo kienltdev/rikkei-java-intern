@@ -1,13 +1,24 @@
 package intern.rikkei.warehousesystem.exception;
 
 import lombok.Builder;
-import lombok.Data;
-import java.time.Instant;
 
-@Data
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+
 @Builder
-public class ApiErrorResponse {
-    private Instant timestamp;
-    private String path;
-    private ErrorPayload error;
+public record ApiErrorResponse (
+        Instant timestamp,
+        int status,
+        String code,
+        String message,
+        String path,
+        String traceId,
+        List<ErrorDetail> errors
+){
+    public ApiErrorResponse {
+        if (errors == null) {
+            errors = Collections.emptyList();
+        }
+    }
 }
