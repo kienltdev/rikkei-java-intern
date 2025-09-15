@@ -24,7 +24,6 @@ import java.time.Instant;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
     private final MessageSource messageSource;
-    private static final String TRACE_ID_ATTRIBUTE = "traceId";
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
@@ -37,7 +36,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 .code(ErrorCodes.UNAUTHORIZED)
                 .message(message)
                 .path(request.getRequestURI())
-                .traceId((String) request.getAttribute(TRACE_ID_ATTRIBUTE))
                 .build();
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

@@ -18,4 +18,5 @@ spring:
 
   flyway:
     enabled: true
-
+  messages:
+    encoding: UTF-8

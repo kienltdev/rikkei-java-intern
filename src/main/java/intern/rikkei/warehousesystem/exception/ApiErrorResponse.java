@@ -13,7 +13,6 @@ public record ApiErrorResponse (
         String code,
         String message,
         String path,
-        String traceId,
         List<ErrorDetail> errors
 ){
     public ApiErrorResponse {

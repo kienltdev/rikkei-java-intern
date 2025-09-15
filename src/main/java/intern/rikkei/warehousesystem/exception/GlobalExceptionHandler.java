@@ -26,7 +26,6 @@ public class GlobalExceptionHandler {
     @Qualifier("errorCodeSource")
     private final MessageSource errorCodeSource;
 
-    private static final String TRACE_ID_ATTRIBUTE = "traceId";
 
     public GlobalExceptionHandler(@Qualifier("messageSource") MessageSource messageSource,
                                   @Qualifier("errorCodeSource") MessageSource errorCodeSource) {
@@ -42,7 +41,6 @@ public class GlobalExceptionHandler {
                 .code(ex.getCode())
                 .message(ex.getMessage())
                 .path(request.getRequestURI())
-                .traceId((String) request.getAttribute(TRACE_ID_ATTRIBUTE))
                 .build();
 
         return ResponseEntity.status(ex.getStatus()).body(apiErrorResponse);
@@ -58,7 +56,6 @@ public class GlobalExceptionHandler {
                 .code(ErrorCodes.INTERNAL_SERVER_ERROR)
                 .message(message)
                 .path(request.getRequestURI())
-                .traceId((String) request.getAttribute(TRACE_ID_ATTRIBUTE))
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiErrorResponse);
@@ -78,7 +75,6 @@ public class GlobalExceptionHandler {
                 .code(ErrorCodes.VALIDATION_ERROR)
                 .message(message)
                 .path(request.getRequestURI())
-                .traceId((String) request.getAttribute(TRACE_ID_ATTRIBUTE))
                 .errors(details)
                 .build();
 

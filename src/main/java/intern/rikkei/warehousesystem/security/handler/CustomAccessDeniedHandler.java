@@ -23,7 +23,6 @@ import java.time.Instant;
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     private final ObjectMapper objectMapper;
     private final MessageSource messageSource;
-    private static final String TRACE_ID_ATTRIBUTE = "traceId";
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
@@ -36,7 +35,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 .code(ErrorCodes.ACCESS_DENIED)
                 .message(message)
                 .path(request.getRequestURI())
-                .traceId((String) request.getAttribute(TRACE_ID_ATTRIBUTE))
                 .build();
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
