@@ -2,9 +2,9 @@ package intern.rikkei.warehousesystem.exception;
 
 import intern.rikkei.warehousesystem.constant.ErrorCodes;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
-import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -19,19 +19,9 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
-    @Qualifier("messageSource")
     private final MessageSource messageSource;
-
-    @Qualifier("errorCodeSource")
-    private final MessageSource errorCodeSource;
-
-
-    public GlobalExceptionHandler(@Qualifier("messageSource") MessageSource messageSource,
-                                  @Qualifier("errorCodeSource") MessageSource errorCodeSource) {
-        this.messageSource = messageSource;
-        this.errorCodeSource = errorCodeSource;
-    }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
@@ -64,7 +54,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
         List<ErrorDetail> details = ex.getBindingResult().getAllErrors().stream()
-                .map(error -> createErrorDetail(error, request.getLocale()))
+                .map(error -> createErrorDetail(error))
                 .collect(Collectors.toList());
 
         String message = messageSource.getMessage("error.validation", null, request.getLocale());
@@ -75,39 +65,20 @@ public class GlobalExceptionHandler {
                 .code(ErrorCodes.VALIDATION_ERROR)
                 .message(message)
                 .path(request.getRequestURI())
-                .errors(details)
+                .validationErrors(details)
                 .build();
 
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    private ErrorDetail createErrorDetail(ObjectError error, Locale locale) {
-        String fieldName = (error instanceof FieldError) ? ((FieldError) error).getField() : error.getObjectName();
-        String humanReadableMessage = error.getDefaultMessage();
-        String customErrorCode = resolveCustomErrorCode(error);
+    private ErrorDetail createErrorDetail(ObjectError error) {
+        String field = (error instanceof FieldError) ? ((FieldError) error).getField() : error.getObjectName();
+        String message = error.getDefaultMessage();
 
-        return new ErrorDetail(fieldName, customErrorCode, humanReadableMessage);
+        return new ErrorDetail(field,  message);
     }
 
-    private String resolveCustomErrorCode(ObjectError error) {
-        String[] codes = error.getCodes();
-        if (codes == null || codes.length == 0) {
-            return "UNKNOWN_VALIDATION_ERROR";
-        }
 
-        for (String code : codes) {
-            try {
-
-                return errorCodeSource.getMessage(code, null, Locale.ROOT);
-            } catch (NoSuchMessageException ex) {
-
-            }
-        }
-
-
-        String fallbackCode = codes[codes.length - 1];
-        return fallbackCode.toUpperCase() + "_ERROR";
-    }
 }
 
 

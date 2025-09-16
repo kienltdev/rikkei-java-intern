@@ -3,6 +3,7 @@ package intern.rikkei.warehousesystem.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import intern.rikkei.warehousesystem.constant.ErrorCodes;
 import intern.rikkei.warehousesystem.exception.ApiErrorResponse;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,13 +29,15 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
             throws IOException, ServletException {
         String message = messageSource.getMessage("error.accessDenied", null, request.getLocale());
+        Object originalUri = request.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI);
+        String path = (originalUri != null) ? originalUri.toString() : request.getRequestURI();
 
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .timestamp(Instant.now())
                 .status(HttpStatus.FORBIDDEN.value())
                 .code(ErrorCodes.ACCESS_DENIED)
                 .message(message)
-                .path(request.getRequestURI())
+                .path(path)
                 .build();
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

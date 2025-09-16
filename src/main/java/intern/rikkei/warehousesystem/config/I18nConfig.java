@@ -19,14 +19,6 @@ public class I18nConfig {
         return messageSource;
     }
 
-    @Bean("errorCodeSource")
-    public MessageSource errorCodeSource() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("validation_error_codes");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setUseCodeAsDefaultMessage(false);
-        return messageSource;
-    }
 
     @Bean
     public LocaleResolver localeResolver() {

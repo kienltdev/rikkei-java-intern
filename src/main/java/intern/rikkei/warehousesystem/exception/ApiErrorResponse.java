@@ -13,11 +13,11 @@ public record ApiErrorResponse (
         String code,
         String message,
         String path,
-        List<ErrorDetail> errors
+        List<ErrorDetail> validationErrors
 ){
     public ApiErrorResponse {
-        if (errors == null) {
-            errors = Collections.emptyList();
+        if (validationErrors == null) {
+            validationErrors = Collections.emptyList();
         }
     }
 }

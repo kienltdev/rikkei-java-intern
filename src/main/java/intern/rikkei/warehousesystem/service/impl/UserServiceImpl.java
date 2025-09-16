@@ -10,14 +10,16 @@ import intern.rikkei.warehousesystem.repository.UserRepository;
 import intern.rikkei.warehousesystem.dto.request.RegisterRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateProfileRequest;
 import intern.rikkei.warehousesystem.dto.response.UserResponse;
+import intern.rikkei.warehousesystem.service.UserCacheService;
 import intern.rikkei.warehousesystem.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Locale;
 
@@ -28,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final MessageSource messageSource;
+    private final UserCacheService userCacheService;
 
     @Override
     @Transactional
@@ -58,15 +61,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse updateProfile(String userName, UpdateProfileRequest updateProfileRequest) {
+    @CacheEvict(cacheNames = "users", key = "#username")
+    public UserResponse updateProfile(String username, UpdateProfileRequest updateProfileRequest) {
+        userCacheService.evictUserFromCache(username);
+
         Locale locale = LocaleContextHolder.getLocale();
-        String userNotFoundMessage = messageSource.getMessage("error.user.notFound", new Object[]{userName}, locale);
-        User user = userRepository.findByUsername(userName)
+        String userNotFoundMessage = messageSource.getMessage("error.user.notFound", new Object[]{username}, locale);
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->  new ResourceNotFoundException(ErrorCodes.USER_NOT_FOUND, userNotFoundMessage));
 
         String newEmail = updateProfileRequest.email();
 
-        if(!user.getEmail().equalsIgnoreCase(newEmail)){
+        if(StringUtils.hasText(newEmail) && !user.getEmail().equalsIgnoreCase(newEmail)){
             if(userRepository.existsByEmail(updateProfileRequest.email())){
                 String emailExistsMessage = messageSource.getMessage("error.email.exists", new Object[]{newEmail}, locale);
                 throw new DuplicateResourceException(ErrorCodes.EMAIL_ALREADY_EXISTS, emailExistsMessage);
@@ -75,7 +81,10 @@ public class UserServiceImpl implements UserService {
         }
 
 
-        user.setFullName(updateProfileRequest.fullName());
+        String newFullName = updateProfileRequest.fullName();
+        if (StringUtils.hasText(newFullName)) {
+            user.setFullName(newFullName);
+        }
 
         User updatedUser = userRepository.save(user);
 
