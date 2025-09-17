@@ -4,17 +4,18 @@ import intern.rikkei.warehousesystem.dto.request.InboundRequest;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
-import intern.rikkei.warehousesystem.exception.DuplicateResourceException;
 import intern.rikkei.warehousesystem.mapper.InboundMapper;
 import intern.rikkei.warehousesystem.repository.InboundRepository;
+import intern.rikkei.warehousesystem.repository.specification.InboundSpecification;
 import intern.rikkei.warehousesystem.service.InboundService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +36,17 @@ public class InboundServiceImpl implements InboundService {
         Inbound savedInbound = inboundRepository.save(inbound);
 
         return inboundMapper.toInboundResponse(savedInbound);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<InboundResponse> findAll(int page, int size, String productType, String supplierCd) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<Inbound> spec = InboundSpecification.filterBy(productType, supplierCd);
+
+        Page<Inbound> inboundPage = inboundRepository.findAll(spec, pageable);
+
+        return inboundPage.map(inboundMapper::toInboundResponse);
     }
 }
