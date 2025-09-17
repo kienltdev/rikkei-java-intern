@@ -25,8 +25,14 @@ public class AuthController {
                 .body(registerUser);
     }
 
-    @GetMapping("/login")
+    @GetMapping("/me")
     public ResponseEntity<UserResponse> login(Principal principal) {
+        UserResponse currentUser = userService.getCurrentUser(principal.getName());
+        return ResponseEntity.ok(currentUser);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponse> getProfile(Principal principal) {
         UserResponse currentUser = userService.getCurrentUser(principal.getName());
         return ResponseEntity.ok(currentUser);
     }

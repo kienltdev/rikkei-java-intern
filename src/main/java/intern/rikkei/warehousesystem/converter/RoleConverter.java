@@ -2,7 +2,9 @@ package intern.rikkei.warehousesystem.converter;
 
 import intern.rikkei.warehousesystem.enums.Role;
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
+@Converter(autoApply = true)
 public class RoleConverter implements AttributeConverter<Role, Integer> {
     @Override
     public Integer convertToDatabaseColumn(Role role){

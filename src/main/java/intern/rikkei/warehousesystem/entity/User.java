@@ -1,7 +1,6 @@
 package intern.rikkei.warehousesystem.entity;
 
 import intern.rikkei.warehousesystem.entity.audit.AuditableEntity;
-import intern.rikkei.warehousesystem.converter.RoleConverter;
 import intern.rikkei.warehousesystem.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,10 +17,10 @@ public class User extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_name", nullable = false, unique = true)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "pass_word", nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "full_name")
@@ -31,7 +30,6 @@ public class User extends AuditableEntity {
     private String email;
 
     @Column(name = "role", nullable = false)
-    @Convert(converter = RoleConverter.class)
     private Role role;
 
 }

@@ -50,6 +50,7 @@ public class WebSecurityConfig {
                                         "/swagger-ui/**",
                                         "/swagger-ui.html"
                                 ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/warehouse/inbounds").hasAnyRole("ADMIN", "STAFF")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())
