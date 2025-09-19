@@ -1,9 +1,13 @@
 package intern.rikkei.warehousesystem.service.impl;
 
 import intern.rikkei.warehousesystem.dto.request.InboundRequest;
+import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
+import intern.rikkei.warehousesystem.exception.InvalidOperationException;
+import intern.rikkei.warehousesystem.exception.ResourceNotFoundException;
 import intern.rikkei.warehousesystem.mapper.InboundMapper;
 import intern.rikkei.warehousesystem.repository.InboundRepository;
 import intern.rikkei.warehousesystem.repository.specification.InboundSpecification;
@@ -40,13 +44,34 @@ public class InboundServiceImpl implements InboundService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<InboundResponse> findAll(int page, int size, String productType, String supplierCd) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<InboundResponse> findAll(InboundSearchRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
 
-        Specification<Inbound> spec = InboundSpecification.filterBy(productType, supplierCd);
+        Specification<Inbound> spec = InboundSpecification.filterBy(
+                request.getProductType(),
+                request.getSupplierCd()
+        );
 
         Page<Inbound> inboundPage = inboundRepository.findAll(spec, pageable);
 
         return inboundPage.map(inboundMapper::toInboundResponse);
+    }
+
+    @Override
+    @Transactional
+    public InboundResponse updateInbound(Long id, UpdateInboundRequest request) {
+        Inbound existingInbound = inboundRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("INBOUND_NOT_FOUND", "Inbound not found with id: " + id));
+
+        if(existingInbound.getStatus() != InboundStatus.NOT_OUTBOUND) {
+            throw new InvalidOperationException(
+                    "UPDATE_NOT_ALLOWED",
+                    "Inbound cannot be updated because it has already been linked to an outbound");
+        }
+
+        inboundMapper.updateInboundFromRequest(request, existingInbound);
+        Inbound savedInbound = inboundRepository.save(existingInbound);
+
+        return inboundMapper.toInboundResponse(savedInbound);
     }
 }

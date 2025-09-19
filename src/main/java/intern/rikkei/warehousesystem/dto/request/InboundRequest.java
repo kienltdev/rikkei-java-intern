@@ -2,28 +2,28 @@ package intern.rikkei.warehousesystem.dto.request;
 
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCode;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import intern.rikkei.warehousesystem.validation.annotation.ValidEnum;
+import jakarta.validation.constraints.*;
 
 import java.time.Instant;
 
 public record InboundRequest(
         @NotBlank(message = "{validation.invoice.required}")
-        @Size(max = 9, message = "{validation.invoice.length}")
+        @Pattern(regexp = "^[0-9]{9}$",
+                message = "{validation.invoice.format}")
         String invoice,
 
-        @NotNull(message = "{validation.productType.required}")
-        ProductType productType,
+        @NotBlank(message = "{validation.productType.required}")
+        @ValidEnum(enumClass = ProductType.class, message = "{validation.productType.invalid}", ignoreCase = true)
+        String  productType,
 
-        @NotNull(message = "{validation.supplierCd.required}")
-        SupplierCode supplierCd,
+        @NotBlank(message = "{validation.supplierCd.required}")
+        @ValidEnum(enumClass = SupplierCode.class, message = "{validation.supplierCd.invalid}", ignoreCase = true)
+        String  supplierCd,
 
         Instant receiveDate,
 
-        @NotNull(message = "{validation.quantity.required}")
-        @Min(value = 1, message = "{validation.quantity.min}")
+        @PositiveOrZero(message = "{validation.quantity.positiveOrZero}")
         Integer quantity
 ) {
 }

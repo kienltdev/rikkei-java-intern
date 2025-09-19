@@ -20,21 +20,13 @@ public class InboundSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.hasText(productType)) {
-                try {
-                    ProductType type = ProductType.valueOf(productType.toUpperCase());
-                    predicates.add(criteriaBuilder.equal(root.get(Inbound_.productType), type));
-                } catch (IllegalArgumentException e) {
-                    // Bỏ qua nếu productType không hợp lệ hoặc có thể throw exception tùy nghiệp vụ
-                }
+                ProductType type = ProductType.valueOf(productType.toUpperCase());
+                predicates.add(criteriaBuilder.equal(root.get(Inbound_.productType), type));
             }
 
             if (StringUtils.hasText(supplierCd)) {
-                try {
-                    SupplierCode code = SupplierCode.fromCode(supplierCd.toUpperCase());
-                    predicates.add(criteriaBuilder.equal(root.get(Inbound_.supplierCd), code));
-                } catch (IllegalArgumentException e) {
-                    // Bỏ qua nếu supplierCd không hợp lệ
-                }
+                SupplierCode code = SupplierCode.fromCode(supplierCd.toUpperCase());
+                predicates.add(criteriaBuilder.equal(root.get(Inbound_.supplierCd), code));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
