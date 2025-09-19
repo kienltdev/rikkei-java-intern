@@ -1,25 +1,27 @@
 package intern.rikkei.warehousesystem.config;
 
+import intern.rikkei.warehousesystem.security.handler.CustomAccessDeniedHandler;
+import intern.rikkei.warehousesystem.security.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import intern.rikkei.warehousesystem.security.handler.CustomAccessDeniedHandler;
-import intern.rikkei.warehousesystem.security.handler.CustomAuthenticationEntryPoint;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class WebSecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
@@ -50,8 +52,6 @@ public class WebSecurityConfig {
                                         "/swagger-ui/**",
                                         "/swagger-ui.html"
                                 ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/warehouse/inbounds").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers(HttpMethod.GET, "/api/warehouse/inbounds").hasAnyRole("ADMIN", "STAFF")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())

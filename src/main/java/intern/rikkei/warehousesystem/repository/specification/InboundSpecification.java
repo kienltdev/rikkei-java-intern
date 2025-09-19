@@ -6,7 +6,6 @@ import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCode;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,18 +14,16 @@ public class InboundSpecification {
 
     private InboundSpecification() {}
 
-    public static Specification<Inbound> filterBy(String productType, String supplierCd) {
+    public static Specification<Inbound> filterBy(ProductType productType, SupplierCode supplierCd) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (StringUtils.hasText(productType)) {
-                ProductType type = ProductType.valueOf(productType.toUpperCase());
-                predicates.add(criteriaBuilder.equal(root.get(Inbound_.productType), type));
+            if (productType != null) {
+                predicates.add(criteriaBuilder.equal(root.get(Inbound_.productType), productType));
             }
 
-            if (StringUtils.hasText(supplierCd)) {
-                SupplierCode code = SupplierCode.fromCode(supplierCd.toUpperCase());
-                predicates.add(criteriaBuilder.equal(root.get(Inbound_.supplierCd), code));
+            if (supplierCd != null) {
+                predicates.add(criteriaBuilder.equal(root.get(Inbound_.supplierCd), supplierCd));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

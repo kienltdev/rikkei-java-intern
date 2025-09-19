@@ -3,23 +3,39 @@ package intern.rikkei.warehousesystem.service.impl;
 import intern.rikkei.warehousesystem.dto.request.InboundRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
+import intern.rikkei.warehousesystem.dto.response.ImportErrorDetail;
+import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
+import intern.rikkei.warehousesystem.enums.ProductType;
+import intern.rikkei.warehousesystem.enums.SupplierCode;
 import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import intern.rikkei.warehousesystem.exception.ResourceNotFoundException;
 import intern.rikkei.warehousesystem.mapper.InboundMapper;
 import intern.rikkei.warehousesystem.repository.InboundRepository;
 import intern.rikkei.warehousesystem.repository.specification.InboundSpecification;
 import intern.rikkei.warehousesystem.service.InboundService;
+import intern.rikkei.warehousesystem.service.parser.FileParserStrategy;
+import intern.rikkei.warehousesystem.service.parser.InboundData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +44,7 @@ public class InboundServiceImpl implements InboundService {
     private final InboundRepository inboundRepository;
     private final InboundMapper inboundMapper;
     private final MessageSource messageSource;
+    private final List<FileParserStrategy> parsers;
 
     @Override
     @Transactional
@@ -47,9 +64,15 @@ public class InboundServiceImpl implements InboundService {
     public Page<InboundResponse> findAll(InboundSearchRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
 
+        ProductType productType = StringUtils.hasText(request.getProductType()) ?
+                ProductType.valueOf(request.getProductType().toUpperCase()) : null;
+
+        SupplierCode supplierCode = StringUtils.hasText(request.getSupplierCd()) ?
+                SupplierCode.fromCode(request.getSupplierCd().toUpperCase()) : null;
+
         Specification<Inbound> spec = InboundSpecification.filterBy(
-                request.getProductType(),
-                request.getSupplierCd()
+                productType,
+                supplierCode
         );
 
         Page<Inbound> inboundPage = inboundRepository.findAll(spec, pageable);
@@ -61,12 +84,14 @@ public class InboundServiceImpl implements InboundService {
     @Transactional
     public InboundResponse updateInbound(Long id, UpdateInboundRequest request) {
         Inbound existingInbound = inboundRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("INBOUND_NOT_FOUND", "Inbound not found with id: " + id));
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage("error.inbound.notFound", new Object[]{id}, LocaleContextHolder.getLocale());
+                    return new ResourceNotFoundException("INBOUND_NOT_FOUND", message);
+                });
 
-        if(existingInbound.getStatus() != InboundStatus.NOT_OUTBOUND) {
-            throw new InvalidOperationException(
-                    "UPDATE_NOT_ALLOWED",
-                    "Inbound cannot be updated because it has already been linked to an outbound");
+        if (existingInbound.getStatus() != InboundStatus.NOT_OUTBOUND) {
+            String message = messageSource.getMessage("error.inbound.updateNotAllowed", new Object[]{existingInbound.getStatus().getName()}, LocaleContextHolder.getLocale());
+            throw new InvalidOperationException("UPDATE_NOT_ALLOWED", message);
         }
 
         inboundMapper.updateInboundFromRequest(request, existingInbound);
@@ -74,4 +99,80 @@ public class InboundServiceImpl implements InboundService {
 
         return inboundMapper.toInboundResponse(savedInbound);
     }
+
+
+
+    @Override
+    @Transactional
+    public ImportResultResponse importFromExcel(MultipartFile file) { // Tên method có thể đổi thành importFromFile
+        // 1. Chọn Strategy phù hợp
+        FileParserStrategy parser = parsers.stream()
+                .filter(p -> p.supports(file.getContentType()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported file type: " + file.getContentType()));
+
+        List<InboundData> dataList;
+        try {
+            // 2. Parse file bằng Strategy đã chọn
+            dataList = parser.parse(file);
+        } catch (IOException e) {
+            // Xử lý lỗi đọc file
+            return ImportResultResponse.builder()
+                    .totalRows(0).successCount(0).failureCount(0)
+                    .errorDetails(List.of(new ImportErrorDetail(0, "Failed to read the file.")))
+                    .build();
+        }
+
+        List<Inbound> successfulInbounds = new ArrayList<>();
+        List<ImportErrorDetail> errorDetails = new ArrayList<>();
+        int rowNum = 1; // Bắt đầu đếm từ dòng dữ liệu đầu tiên
+
+        // 3. Logic xử lý, validate, tạo entity (GIỮ NGUYÊN)
+        for (InboundData data : dataList) {
+            rowNum++; // Tăng số dòng (tương ứng với dòng trong file, bỏ qua header)
+            try {
+                // Validate dữ liệu
+                if (!StringUtils.hasText(data.invoice()) || !data.invoice().matches("^[0-9]{9}$")) {
+                    throw new IllegalArgumentException("Invalid invoice format. Must be 9 digits.");
+                }
+                // ... các validation khác ...
+
+                // Tạo Entity
+                Inbound inbound = new Inbound();
+                inbound.setSupplierCd(SupplierCode.fromCode(data.supplierCd().toUpperCase()));
+                inbound.setInvoice(data.invoice());
+                inbound.setProductType(ProductType.valueOf(data.productType().trim().toUpperCase()));
+
+                if (StringUtils.hasText(data.quantity())) {
+                    inbound.setQuantity(Integer.parseInt(data.quantity()));
+                }
+                if (StringUtils.hasText(data.receiveDate())) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate date = LocalDate.parse(data.receiveDate(), formatter);
+                    inbound.setReceiveDate(date.atStartOfDay().toInstant(ZoneOffset.UTC));
+                }
+
+                inbound.setStatus(InboundStatus.NOT_OUTBOUND);
+                successfulInbounds.add(inbound);
+
+            } catch (Exception e) {
+                errorDetails.add(new ImportErrorDetail(rowNum, e.getMessage()));
+            }
+        }
+
+        // 4. Lưu hàng loạt (GIỮ NGUYÊN)
+        if (!successfulInbounds.isEmpty()) {
+            inboundRepository.saveAll(successfulInbounds);
+        }
+
+        // 5. Trả về kết quả (GIỮ NGUYÊN)
+        return ImportResultResponse.builder()
+                .totalRows(dataList.size())
+                .successCount(successfulInbounds.size())
+                .failureCount(errorDetails.size())
+                .errorDetails(errorDetails)
+                .build();
+    }
+
+
 }
