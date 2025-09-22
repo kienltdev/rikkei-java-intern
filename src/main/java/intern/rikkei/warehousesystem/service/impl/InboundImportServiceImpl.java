@@ -1,0 +1,122 @@
+package intern.rikkei.warehousesystem.service.impl;
+
+import intern.rikkei.warehousesystem.dto.request.InboundImportRowDTO;
+import intern.rikkei.warehousesystem.dto.response.ImportErrorDetail;
+import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
+import intern.rikkei.warehousesystem.entity.Inbound;
+import intern.rikkei.warehousesystem.exception.InvalidOperationException;
+import intern.rikkei.warehousesystem.mapper.InboundMapper;
+import intern.rikkei.warehousesystem.repository.InboundRepository;
+import intern.rikkei.warehousesystem.service.InboundImportService;
+import intern.rikkei.warehousesystem.service.parser.FileParserStrategy;
+import intern.rikkei.warehousesystem.service.parser.InboundData;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+
+@Service
+@RequiredArgsConstructor
+public class InboundImportServiceImpl implements InboundImportService {
+
+    private final List<FileParserStrategy> parsers;
+    private final Validator validator;
+    private final InboundMapper inboundMapper;
+    private final InboundRepository inboundRepository;
+
+    @Override
+    @Transactional
+    public ImportResultResponse importInbounds(MultipartFile file) {
+
+        FileParserStrategy parser = findParser(file.getContentType());
+
+        List<InboundData> rawDataList = parseFile(file, parser);
+
+        List<Inbound> successfulInbounds = new ArrayList<>();
+        List<ImportErrorDetail> errorDetails = new ArrayList<>();
+
+        // Xử lý từng dòng dữ liệu
+        for (int i = 0; i < rawDataList.size(); i++) {
+            // Dòng trong file excel/csv bắt đầu từ 2 (sau header)
+            int rowNumber = i + 2;
+            InboundData rawData = rawDataList.get(i);
+
+            // Chuyển đổi dữ liệu thô sang DTO để validation
+            InboundImportRowDTO rowDTO = createDtoFromRawData(rawData);
+
+            // Validate DTO bằng Validator
+            Set<ConstraintViolation<InboundImportRowDTO>> violations = validator.validate(rowDTO);
+
+            if (violations.isEmpty()) {
+                // Nếu không có lỗi validation, chuyển đổi DTO thành Entity và thêm vào danh sách thành công
+                Inbound inbound = inboundMapper.fromImportDtoToEntity(rowDTO);
+                successfulInbounds.add(inbound);
+            } else {
+                // Nếu có lỗi, tổng hợp các lỗi và thêm vào danh sách lỗi
+                String errorMessage = violations.stream()
+                        .map(ConstraintViolation::getMessage)
+                        .collect(Collectors.joining(", "));
+                errorDetails.add(new ImportErrorDetail(rowNumber, errorMessage));
+            }
+        }
+
+        // 4. Lưu tất cả các bản ghi hợp lệ vào DB trong một lần gọi
+        if (!successfulInbounds.isEmpty()) {
+            inboundRepository.saveAll(successfulInbounds);
+        }
+
+        // 5. Xây dựng và trả về kết quả import
+        return ImportResultResponse.builder()
+                .totalRows(rawDataList.size())
+                .successCount(successfulInbounds.size())
+                .failureCount(errorDetails.size())
+                .errorDetails(errorDetails)
+                .build();
+    }
+
+    private FileParserStrategy findParser(String contentType) {
+        return parsers.stream()
+                .filter(p -> p.supports(contentType))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported file type: " + contentType));
+    }
+
+    private List<InboundData> parseFile(MultipartFile file, FileParserStrategy parser) {
+        try {
+            return parser.parse(file);
+        } catch (IOException e) {
+            // Ném ra một exception nghiệp vụ rõ ràng hơn
+            throw new InvalidOperationException("FILE_READ_ERROR", "Failed to read the file: " + e.getMessage());
+        }
+    }
+
+    private InboundImportRowDTO createDtoFromRawData(InboundData rawData) {
+        Integer quantity = null;
+        if (StringUtils.hasText(rawData.quantity())) {
+            try {
+                quantity = Integer.parseInt(rawData.quantity());
+            } catch (NumberFormatException e) {
+                // Để validator xử lý lỗi này, ta có thể không làm gì ở đây
+                // hoặc gán một giá trị không hợp lệ để validator bắt
+            }
+        }
+        return new InboundImportRowDTO(
+                rawData.supplierCd(),
+                rawData.invoice(),
+                rawData.productType(),
+                quantity,
+                rawData.receiveDate()
+        );
+    }
+}

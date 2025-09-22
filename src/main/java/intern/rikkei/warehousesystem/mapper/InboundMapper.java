@@ -1,20 +1,23 @@
 package intern.rikkei.warehousesystem.mapper;
 
+import intern.rikkei.warehousesystem.dto.request.InboundImportRowDTO;
 import intern.rikkei.warehousesystem.dto.request.InboundRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
+import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCode;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 import org.springframework.util.StringUtils;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Mapper(
         componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        imports = {InboundStatus.class, LocalDate.class, DateTimeFormatter.class}
 )
 public interface InboundMapper {
 
@@ -31,6 +34,13 @@ public interface InboundMapper {
     @Mapping(target = "updatedAt", ignore = true)
     void updateInboundFromRequest(UpdateInboundRequest request, @MappingTarget Inbound inbound);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "status", expression = "java(InboundStatus.NOT_OUTBOUND)")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(source = "receiveDate", target = "receiveDate", qualifiedByName = "stringToLocalDate")
+    Inbound fromImportDtoToEntity(InboundImportRowDTO dto);
+
     default ProductType toProductType(String productTypeStr) {
         if (StringUtils.hasText(productTypeStr)) {
             return ProductType.valueOf(productTypeStr.trim().toUpperCase());
@@ -41,6 +51,14 @@ public interface InboundMapper {
     default SupplierCode toSupplierCode(String supplierCdStr) {
         if (StringUtils.hasText(supplierCdStr)) {
             return SupplierCode.fromCode(supplierCdStr.trim().toUpperCase());
+        }
+        return null;
+    }
+
+    @Named("stringToLocalDate")
+    default LocalDate stringToLocalDate(String date) {
+        if (StringUtils.hasText(date)) {
+            return LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         }
         return null;
     }

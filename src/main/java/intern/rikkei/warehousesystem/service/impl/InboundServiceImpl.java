@@ -3,7 +3,6 @@ package intern.rikkei.warehousesystem.service.impl;
 import intern.rikkei.warehousesystem.dto.request.InboundRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
-import intern.rikkei.warehousesystem.dto.response.ImportErrorDetail;
 import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
@@ -15,9 +14,9 @@ import intern.rikkei.warehousesystem.exception.ResourceNotFoundException;
 import intern.rikkei.warehousesystem.mapper.InboundMapper;
 import intern.rikkei.warehousesystem.repository.InboundRepository;
 import intern.rikkei.warehousesystem.repository.specification.InboundSpecification;
+import intern.rikkei.warehousesystem.service.InboundImportService;
 import intern.rikkei.warehousesystem.service.InboundService;
 import intern.rikkei.warehousesystem.service.parser.FileParserStrategy;
-import intern.rikkei.warehousesystem.service.parser.InboundData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -30,10 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,6 +39,7 @@ public class InboundServiceImpl implements InboundService {
     private final InboundMapper inboundMapper;
     private final MessageSource messageSource;
     private final List<FileParserStrategy> parsers;
+    private final InboundImportService inboundImportService;
 
     @Override
     @Transactional
@@ -100,68 +96,7 @@ public class InboundServiceImpl implements InboundService {
     }
 
 
-
     @Override
-    @Transactional
     public ImportResultResponse importFromExcel(MultipartFile file) {
-        FileParserStrategy parser = parsers.stream()
-                .filter(p -> p.supports(file.getContentType()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported file type: " + file.getContentType()));
-
-        List<InboundData> dataList;
-        try {
-            dataList = parser.parse(file);
-        } catch (IOException e) {
-            return ImportResultResponse.builder()
-                    .totalRows(0).successCount(0).failureCount(0)
-                    .errorDetails(List.of(new ImportErrorDetail(0, "Failed to read the file.")))
-                    .build();
-        }
-
-        List<Inbound> successfulInbounds = new ArrayList<>();
-        List<ImportErrorDetail> errorDetails = new ArrayList<>();
-        int rowNum = 1;
-
-        for (InboundData data : dataList) {
-            rowNum++;
-            try {
-                if (!StringUtils.hasText(data.invoice()) || !data.invoice().matches("^[0-9]{9}$")) {
-                    throw new IllegalArgumentException("Invalid invoice format. Must be 9 digits.");
-                }
-
-                Inbound inbound = new Inbound();
-                inbound.setSupplierCd(SupplierCode.fromCode(data.supplierCd().toUpperCase()));
-                inbound.setInvoice(data.invoice());
-                inbound.setProductType(ProductType.valueOf(data.productType().trim().toUpperCase()));
-
-                if (StringUtils.hasText(data.quantity())) {
-                    inbound.setQuantity(Integer.parseInt(data.quantity()));
-                }
-                if (StringUtils.hasText(data.receiveDate())) {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    inbound.setReceiveDate(LocalDate.parse(data.receiveDate(), formatter));
-                }
-
-                inbound.setStatus(InboundStatus.NOT_OUTBOUND);
-                successfulInbounds.add(inbound);
-
-            } catch (Exception e) {
-                errorDetails.add(new ImportErrorDetail(rowNum, e.getMessage()));
-            }
-        }
-
-        if (!successfulInbounds.isEmpty()) {
-            inboundRepository.saveAll(successfulInbounds);
-        }
-
-        return ImportResultResponse.builder()
-                .totalRows(dataList.size())
-                .successCount(successfulInbounds.size())
-                .failureCount(errorDetails.size())
-                .errorDetails(errorDetails)
-                .build();
-    }
-
-
-}
+        return inboundImportService.importInbounds(file);
+    }}
