@@ -3,9 +3,11 @@ package intern.rikkei.warehousesystem.dto.request;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCode;
 import intern.rikkei.warehousesystem.validation.annotation.ValidEnum;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 public record InboundRequest(
         @NotBlank(message = "{validation.invoice.required}")
@@ -21,7 +23,7 @@ public record InboundRequest(
         @ValidEnum(enumClass = SupplierCode.class, message = "{validation.supplierCd.invalid}", ignoreCase = true)
         String  supplierCd,
 
-        Instant receiveDate,
+        LocalDate receiveDate,
 
         @PositiveOrZero(message = "{validation.quantity.positiveOrZero}")
         Integer quantity

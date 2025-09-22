@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "inbound")
@@ -30,7 +30,7 @@ public class Inbound extends AuditableEntity {
     private SupplierCode supplierCd;
 
     @Column(name = "receive_date")
-    private Instant receiveDate;
+    private LocalDate receiveDate;
 
     @Column(name = "status", nullable = false)
     private InboundStatus status;

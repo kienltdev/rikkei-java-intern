@@ -5,13 +5,14 @@ import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCode;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 public record InboundResponse(
         Long id,
         String invoice,
         ProductType productType,
         SupplierCode supplierCd,
-        Instant receiveDate,
+        LocalDate receiveDate,
         InboundStatus status,
         Integer quantity,
         boolean editable,

@@ -32,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,8 +103,7 @@ public class InboundServiceImpl implements InboundService {
 
     @Override
     @Transactional
-    public ImportResultResponse importFromExcel(MultipartFile file) { // Tên method có thể đổi thành importFromFile
-        // 1. Chọn Strategy phù hợp
+    public ImportResultResponse importFromExcel(MultipartFile file) {
         FileParserStrategy parser = parsers.stream()
                 .filter(p -> p.supports(file.getContentType()))
                 .findFirst()
@@ -113,10 +111,8 @@ public class InboundServiceImpl implements InboundService {
 
         List<InboundData> dataList;
         try {
-            // 2. Parse file bằng Strategy đã chọn
             dataList = parser.parse(file);
         } catch (IOException e) {
-            // Xử lý lỗi đọc file
             return ImportResultResponse.builder()
                     .totalRows(0).successCount(0).failureCount(0)
                     .errorDetails(List.of(new ImportErrorDetail(0, "Failed to read the file.")))
@@ -125,19 +121,15 @@ public class InboundServiceImpl implements InboundService {
 
         List<Inbound> successfulInbounds = new ArrayList<>();
         List<ImportErrorDetail> errorDetails = new ArrayList<>();
-        int rowNum = 1; // Bắt đầu đếm từ dòng dữ liệu đầu tiên
+        int rowNum = 1;
 
-        // 3. Logic xử lý, validate, tạo entity (GIỮ NGUYÊN)
         for (InboundData data : dataList) {
-            rowNum++; // Tăng số dòng (tương ứng với dòng trong file, bỏ qua header)
+            rowNum++;
             try {
-                // Validate dữ liệu
                 if (!StringUtils.hasText(data.invoice()) || !data.invoice().matches("^[0-9]{9}$")) {
                     throw new IllegalArgumentException("Invalid invoice format. Must be 9 digits.");
                 }
-                // ... các validation khác ...
 
-                // Tạo Entity
                 Inbound inbound = new Inbound();
                 inbound.setSupplierCd(SupplierCode.fromCode(data.supplierCd().toUpperCase()));
                 inbound.setInvoice(data.invoice());
@@ -148,8 +140,7 @@ public class InboundServiceImpl implements InboundService {
                 }
                 if (StringUtils.hasText(data.receiveDate())) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    LocalDate date = LocalDate.parse(data.receiveDate(), formatter);
-                    inbound.setReceiveDate(date.atStartOfDay().toInstant(ZoneOffset.UTC));
+                    inbound.setReceiveDate(LocalDate.parse(data.receiveDate(), formatter));
                 }
 
                 inbound.setStatus(InboundStatus.NOT_OUTBOUND);
@@ -160,12 +151,10 @@ public class InboundServiceImpl implements InboundService {
             }
         }
 
-        // 4. Lưu hàng loạt (GIỮ NGUYÊN)
         if (!successfulInbounds.isEmpty()) {
             inboundRepository.saveAll(successfulInbounds);
         }
 
-        // 5. Trả về kết quả (GIỮ NGUYÊN)
         return ImportResultResponse.builder()
                 .totalRows(dataList.size())
                 .successCount(successfulInbounds.size())

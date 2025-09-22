@@ -63,8 +63,7 @@ public class InboundController {
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ImportResultResponse> importInbounds(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            // Đây là một validation cơ bản, có thể trả về lỗi BAD_REQUEST
-            // Tạm thời để đơn giản, ta sẽ để Service xử lý
+
         }
 
         ImportResultResponse result = inboundService.importFromExcel(file);

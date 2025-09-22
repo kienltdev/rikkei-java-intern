@@ -19,7 +19,7 @@ CREATE TABLE inbound
     invoice      VARCHAR(9)  NOT NULL,
     product_type VARCHAR(50) NOT NULL,
     supplier_cd  VARCHAR(2)  NOT NULL,
-    receive_date TIMESTAMP,
+    receive_date DATE,
     status       TINYINT     NOT NULL,
     quantity     INT,
     created_at   TIMESTAMP   NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE outbound
     inb_id          BIGINT NOT NULL,
     quantity        INT,
     shipping_method VARCHAR(1),
-    shipping_date   TIMESTAMP,
+    shipping_date   DATE,
     created_at      TIMESTAMP,
     updated_at      TIMESTAMP,
     CONSTRAINT fk_outbound_inbound FOREIGN KEY (inb_id) REFERENCES inbound (id)
