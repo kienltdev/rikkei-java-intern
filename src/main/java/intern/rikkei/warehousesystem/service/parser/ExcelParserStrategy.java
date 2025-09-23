@@ -51,7 +51,6 @@ public class ExcelParserStrategy implements FileParserStrategy {
             case STRING: return cell.getStringCellValue().trim();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    // Xử lý nếu cột ngày tháng bị format thành số
                     return cell.getLocalDateTimeCellValue().toLocalDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                 }
                 return String.valueOf((long) cell.getNumericCellValue());

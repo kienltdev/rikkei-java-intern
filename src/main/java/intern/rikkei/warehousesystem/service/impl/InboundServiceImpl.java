@@ -2,9 +2,11 @@ package intern.rikkei.warehousesystem.service.impl;
 
 import intern.rikkei.warehousesystem.dto.request.InboundRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
 import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
+import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
@@ -99,4 +101,40 @@ public class InboundServiceImpl implements InboundService {
     @Override
     public ImportResultResponse importFromExcel(MultipartFile file) {
         return inboundImportService.importInbounds(file);
-    }}
+    }
+
+    @Override
+    @Transactional
+    public void deleteInbound(Long id) {
+        Inbound inboundToDelete = inboundRepository.findById(id)
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage("error.inbound.notFound",
+                            new Object[]{id}, LocaleContextHolder.getLocale());
+                    return new ResourceNotFoundException("INBOUND_NOT_FOUND", message);
+                });
+
+        if(inboundToDelete.getStatus() != InboundStatus.NOT_OUTBOUND){
+            String message = messageSource.getMessage("error.inbound.deleteNotAllowed",
+                    new Object[]{inboundToDelete.getStatus().getName()},
+                    LocaleContextHolder.getLocale());
+            throw new InvalidOperationException("DELETE_NOT_ALLOWED", message);
+        }
+
+        inboundRepository.delete(inboundToDelete);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<InboundStatisticsResponse> getInboundStatistics(InboundStatisticsRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+
+        ProductType productType = StringUtils.hasText(request.getProductType()) ?
+                ProductType.valueOf(request.getProductType().toUpperCase()) : null;
+
+        SupplierCode supplierCode = StringUtils.hasText(request.getSupplierCd()) ?
+                SupplierCode.fromCode(request.getSupplierCd().toUpperCase()) : null;
+
+        return inboundRepository.findInboundStatistics(productType, supplierCode, pageable);
+    }
+}
+

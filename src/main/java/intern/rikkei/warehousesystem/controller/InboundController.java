@@ -2,9 +2,11 @@ package intern.rikkei.warehousesystem.controller;
 
 import intern.rikkei.warehousesystem.dto.request.InboundRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
 import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
+import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
 import intern.rikkei.warehousesystem.dto.response.PaginatedResponse;
 import intern.rikkei.warehousesystem.service.InboundService;
 import jakarta.validation.Valid;
@@ -69,4 +71,30 @@ public class InboundController {
         ImportResultResponse result = inboundService.importFromExcel(file);
         return ResponseEntity.ok(result);
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInbound(@PathVariable Long id) {
+        inboundService.deleteInbound(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @GetMapping("/statistics")
+    public ResponseEntity<PaginatedResponse<InboundStatisticsResponse>> getStatistics(
+            @Valid InboundStatisticsRequest request) {
+
+        Page<InboundStatisticsResponse> statisticsPage = inboundService.getInboundStatistics(request);
+
+        PaginatedResponse<InboundStatisticsResponse> response = new PaginatedResponse<>(
+                statisticsPage.getContent(),
+                statisticsPage.getNumber(),
+                statisticsPage.getSize(),
+                statisticsPage.getTotalPages(),
+                statisticsPage.getTotalElements()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 }
