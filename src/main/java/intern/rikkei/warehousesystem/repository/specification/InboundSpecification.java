@@ -3,7 +3,7 @@ package intern.rikkei.warehousesystem.repository.specification;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Inbound_;
 import intern.rikkei.warehousesystem.enums.ProductType;
-import intern.rikkei.warehousesystem.enums.SupplierCode;
+import intern.rikkei.warehousesystem.enums.SupplierCd;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -14,7 +14,7 @@ public class InboundSpecification {
 
     private InboundSpecification() {}
 
-    public static Specification<Inbound> filterBy(ProductType productType, SupplierCode supplierCd) {
+    public static Specification<Inbound> filterBy(ProductType productType, SupplierCd supplierCd) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 

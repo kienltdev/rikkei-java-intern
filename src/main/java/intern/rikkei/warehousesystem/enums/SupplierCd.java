@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 @Getter
 @RequiredArgsConstructor
-public enum SupplierCode {
+public enum SupplierCd {
     VN("VN", "Việt Nam"),
     TH("TH", "Thái Lan"),
     MY("MY", "Malaysia"),
@@ -21,11 +21,11 @@ public enum SupplierCode {
     private final String code;
     private final String name;
 
-    public static SupplierCode fromCode(String code) {
+    public static SupplierCd fromCode(String code) {
         if (code == null) {
             return null;
         }
-        return Stream.of(SupplierCode.values())
+        return Stream.of(intern.rikkei.warehousesystem.enums.SupplierCd.values())
                 .filter(supplier -> supplier.getCode().equalsIgnoreCase(code))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid supplier code: " + code));

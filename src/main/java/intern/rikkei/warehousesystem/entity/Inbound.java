@@ -3,7 +3,7 @@ package intern.rikkei.warehousesystem.entity;
 import intern.rikkei.warehousesystem.entity.audit.AuditableEntity;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
-import intern.rikkei.warehousesystem.enums.SupplierCode;
+import intern.rikkei.warehousesystem.enums.SupplierCd;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +27,7 @@ public class Inbound extends AuditableEntity {
     private ProductType productType;
 
     @Column(name = "supplier_cd", length = 2, nullable = false)
-    private SupplierCode supplierCd;
+    private SupplierCd supplierCd;
 
     @Column(name = "receive_date")
     private LocalDate receiveDate;

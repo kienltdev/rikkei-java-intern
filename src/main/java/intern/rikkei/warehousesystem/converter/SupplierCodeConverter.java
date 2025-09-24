@@ -1,25 +1,25 @@
 package intern.rikkei.warehousesystem.converter;
 
-import intern.rikkei.warehousesystem.enums.SupplierCode;
+import intern.rikkei.warehousesystem.enums.SupplierCd;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class SupplierCodeConverter implements AttributeConverter<SupplierCode, String> {
+public class SupplierCodeConverter implements AttributeConverter<SupplierCd, String> {
 
     @Override
-    public String convertToDatabaseColumn(SupplierCode supplierCode) {
-        if (supplierCode == null) {
+    public String convertToDatabaseColumn(SupplierCd supplierCd) {
+        if (supplierCd == null) {
             return null;
         }
-        return supplierCode.getCode();
+        return supplierCd.getCode();
     }
 
     @Override
-    public SupplierCode convertToEntityAttribute(String supplierCode) {
+    public SupplierCd convertToEntityAttribute(String supplierCode) {
         if (supplierCode == null) {
             return null;
         }
-        return SupplierCode.fromCode(supplierCode);
+        return intern.rikkei.warehousesystem.enums.SupplierCd.fromCode(supplierCode);
     }
 }

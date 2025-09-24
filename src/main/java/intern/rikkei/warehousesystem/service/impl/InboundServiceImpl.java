@@ -10,7 +10,7 @@ import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
-import intern.rikkei.warehousesystem.enums.SupplierCode;
+import intern.rikkei.warehousesystem.enums.SupplierCd;
 import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import intern.rikkei.warehousesystem.exception.ResourceNotFoundException;
 import intern.rikkei.warehousesystem.mapper.InboundMapper;
@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -58,18 +57,17 @@ public class InboundServiceImpl implements InboundService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<InboundResponse> findAll(InboundSearchRequest request) {
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+    public Page<InboundResponse> findAll(InboundSearchRequest request, Pageable pageable) {
 
         ProductType productType = StringUtils.hasText(request.getProductType()) ?
                 ProductType.valueOf(request.getProductType().toUpperCase()) : null;
 
-        SupplierCode supplierCode = StringUtils.hasText(request.getSupplierCd()) ?
-                SupplierCode.fromCode(request.getSupplierCd().toUpperCase()) : null;
+        SupplierCd supplierCd = StringUtils.hasText(request.getSupplierCd()) ?
+                intern.rikkei.warehousesystem.enums.SupplierCd.fromCode(request.getSupplierCd().toUpperCase()) : null;
 
         Specification<Inbound> spec = InboundSpecification.filterBy(
                 productType,
-                supplierCode
+                supplierCd
         );
 
         Page<Inbound> inboundPage = inboundRepository.findAll(spec, pageable);
@@ -125,16 +123,15 @@ public class InboundServiceImpl implements InboundService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<InboundStatisticsResponse> getInboundStatistics(InboundStatisticsRequest request) {
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+    public Page<InboundStatisticsResponse> getInboundStatistics(InboundStatisticsRequest request, Pageable pageable) {
 
         ProductType productType = StringUtils.hasText(request.getProductType()) ?
                 ProductType.valueOf(request.getProductType().toUpperCase()) : null;
 
-        SupplierCode supplierCode = StringUtils.hasText(request.getSupplierCd()) ?
-                SupplierCode.fromCode(request.getSupplierCd().toUpperCase()) : null;
+        SupplierCd supplierCd = StringUtils.hasText(request.getSupplierCd()) ?
+                SupplierCd.fromCode(request.getSupplierCd().toUpperCase()) : null;
 
-        return inboundRepository.findInboundStatistics(productType, supplierCode, pageable);
+        return inboundRepository.findInboundStatistics(productType, supplierCd, pageable);
     }
 }
 

@@ -1,11 +1,11 @@
 package intern.rikkei.warehousesystem.dto.response;
 
 import intern.rikkei.warehousesystem.enums.ProductType;
-import intern.rikkei.warehousesystem.enums.SupplierCode;
+import intern.rikkei.warehousesystem.enums.SupplierCd;
 
 public record InboundStatisticsResponse(
         ProductType productType,
-        SupplierCode supplierCode,
+        SupplierCd supplierCd,
         Long totalQuantity,
         Long totalInBoundsOrder) {
 

@@ -7,7 +7,7 @@ import intern.rikkei.warehousesystem.dto.response.InboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
-import intern.rikkei.warehousesystem.enums.SupplierCode;
+import intern.rikkei.warehousesystem.enums.SupplierCd;
 import org.mapstruct.*;
 import org.springframework.util.StringUtils;
 
@@ -48,9 +48,9 @@ public interface InboundMapper {
         return null;
     }
 
-    default SupplierCode toSupplierCode(String supplierCdStr) {
+    default SupplierCd toSupplierCode(String supplierCdStr) {
         if (StringUtils.hasText(supplierCdStr)) {
-            return SupplierCode.fromCode(supplierCdStr.trim().toUpperCase());
+            return intern.rikkei.warehousesystem.enums.SupplierCd.fromCode(supplierCdStr.trim().toUpperCase());
         }
         return null;
     }

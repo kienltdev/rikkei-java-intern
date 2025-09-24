@@ -1,7 +1,7 @@
 package intern.rikkei.warehousesystem.dto.request;
 
 import intern.rikkei.warehousesystem.enums.ProductType;
-import intern.rikkei.warehousesystem.enums.SupplierCode;
+import intern.rikkei.warehousesystem.enums.SupplierCd;
 import intern.rikkei.warehousesystem.validation.annotation.ValidEnum;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -23,7 +23,7 @@ public record UpdateInboundRequest(
         String productType,
 
 
-        @ValidEnum(enumClass = SupplierCode.class,
+        @ValidEnum(enumClass = SupplierCd.class,
                 message = "{validation.supplierCd.invalid}",
                 ignoreCase = true)
         String supplierCd,

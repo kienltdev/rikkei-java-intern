@@ -3,7 +3,7 @@ package intern.rikkei.warehousesystem.repository;
 import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.ProductType;
-import intern.rikkei.warehousesystem.enums.SupplierCode;
+import intern.rikkei.warehousesystem.enums.SupplierCd;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,7 +32,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
             """)
     Page<InboundStatisticsResponse> findInboundStatistics(
             @Param("productType") ProductType productType,
-            @Param("supplierCd") SupplierCode supplierCd,
+            @Param("supplierCd") SupplierCd supplierCd,
             Pageable pageable
     );
 }

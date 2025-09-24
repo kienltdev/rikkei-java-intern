@@ -12,6 +12,7 @@ import intern.rikkei.warehousesystem.service.InboundService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,13 +38,13 @@ public class InboundController {
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping
     public ResponseEntity<PaginatedResponse<InboundResponse>> getInbounds(
-            @Valid InboundSearchRequest request) {
+            @Valid InboundSearchRequest request, Pageable pageable) {
 
-        Page<InboundResponse> inboundPage = inboundService.findAll(request);
+        Page<InboundResponse> inboundPage = inboundService.findAll(request, pageable);
 
         PaginatedResponse<InboundResponse> response = new PaginatedResponse<>(
                 inboundPage.getContent(),
-                inboundPage.getNumber(),
+                inboundPage.getNumber() + 1,
                 inboundPage.getSize(),
                 inboundPage.getTotalPages(),
                 inboundPage.getTotalElements()
@@ -82,13 +83,13 @@ public class InboundController {
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("/statistics")
     public ResponseEntity<PaginatedResponse<InboundStatisticsResponse>> getStatistics(
-            @Valid InboundStatisticsRequest request) {
+            @Valid InboundStatisticsRequest request, Pageable pageable) {
 
-        Page<InboundStatisticsResponse> statisticsPage = inboundService.getInboundStatistics(request);
+        Page<InboundStatisticsResponse> statisticsPage = inboundService.getInboundStatistics(request, pageable);
 
         PaginatedResponse<InboundStatisticsResponse> response = new PaginatedResponse<>(
                 statisticsPage.getContent(),
-                statisticsPage.getNumber(),
+                statisticsPage.getNumber() + 1,
                 statisticsPage.getSize(),
                 statisticsPage.getTotalPages(),
                 statisticsPage.getTotalElements()
