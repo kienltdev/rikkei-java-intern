@@ -13,7 +13,6 @@ import intern.rikkei.warehousesystem.service.parser.InboundData;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -46,24 +45,18 @@ public class InboundImportServiceImpl implements InboundImportService {
         List<Inbound> successfulInbounds = new ArrayList<>();
         List<ImportErrorDetail> errorDetails = new ArrayList<>();
 
-        // Xử lý từng dòng dữ liệu
         for (int i = 0; i < rawDataList.size(); i++) {
-            // Dòng trong file excel/csv bắt đầu từ 2 (sau header)
             int rowNumber = i + 2;
             InboundData rawData = rawDataList.get(i);
 
-            // Chuyển đổi dữ liệu thô sang DTO để validation
             InboundImportRowDTO rowDTO = createDtoFromRawData(rawData);
 
-            // Validate DTO bằng Validator
             Set<ConstraintViolation<InboundImportRowDTO>> violations = validator.validate(rowDTO);
 
             if (violations.isEmpty()) {
-                // Nếu không có lỗi validation, chuyển đổi DTO thành Entity và thêm vào danh sách thành công
                 Inbound inbound = inboundMapper.fromImportDtoToEntity(rowDTO);
                 successfulInbounds.add(inbound);
             } else {
-                // Nếu có lỗi, tổng hợp các lỗi và thêm vào danh sách lỗi
                 String errorMessage = violations.stream()
                         .map(ConstraintViolation::getMessage)
                         .collect(Collectors.joining(", "));
@@ -71,12 +64,10 @@ public class InboundImportServiceImpl implements InboundImportService {
             }
         }
 
-        // 4. Lưu tất cả các bản ghi hợp lệ vào DB trong một lần gọi
         if (!successfulInbounds.isEmpty()) {
             inboundRepository.saveAll(successfulInbounds);
         }
 
-        // 5. Xây dựng và trả về kết quả import
         return ImportResultResponse.builder()
                 .totalRows(rawDataList.size())
                 .successCount(successfulInbounds.size())
@@ -96,7 +87,6 @@ public class InboundImportServiceImpl implements InboundImportService {
         try {
             return parser.parse(file);
         } catch (IOException e) {
-            // Ném ra một exception nghiệp vụ rõ ràng hơn
             throw new InvalidOperationException("FILE_READ_ERROR", "Failed to read the file: " + e.getMessage());
         }
     }

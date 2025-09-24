@@ -16,7 +16,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
             SELECT new intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse(
                 i.productType,
                 i.supplierCd,
-                SUM(i.quantity),
+                COALESCE(SUM(i.quantity), 0) ,
                 COUNT(i.id)
             )
             FROM Inbound i
