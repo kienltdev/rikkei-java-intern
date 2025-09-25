@@ -2,6 +2,7 @@ package intern.rikkei.warehousesystem.controller;
 
 import intern.rikkei.warehousesystem.dto.request.OutboundRequest;
 import intern.rikkei.warehousesystem.dto.request.OutboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.response.OutboundDetailResponse;
 import intern.rikkei.warehousesystem.dto.response.OutboundResponse;
 import intern.rikkei.warehousesystem.dto.response.PaginatedResponse;
 import intern.rikkei.warehousesystem.service.OutboundService;
@@ -45,5 +46,12 @@ public class OutboundController {
     public ResponseEntity<OutboundResponse> createOutbound(@Valid @RequestBody OutboundRequest request) {
         OutboundResponse response = outboundService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<OutboundDetailResponse>  getOutboundDetail(@PathVariable Long id) {
+        OutboundDetailResponse response = outboundService.findById(id);
+        return ResponseEntity.ok(response);
     }
 }

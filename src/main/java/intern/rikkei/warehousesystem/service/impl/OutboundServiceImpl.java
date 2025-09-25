@@ -2,6 +2,7 @@ package intern.rikkei.warehousesystem.service.impl;
 
 import intern.rikkei.warehousesystem.dto.request.OutboundRequest;
 import intern.rikkei.warehousesystem.dto.request.OutboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.response.OutboundDetailResponse;
 import intern.rikkei.warehousesystem.dto.response.OutboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Outbound;
@@ -73,11 +74,23 @@ public class OutboundServiceImpl implements OutboundService {
             inboundRepository.save(inbound);
 
         }
-
-
-
         return outboundMapper.toOutboundResponse(savedOutbound);
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public OutboundDetailResponse findById(Long id) {
+        Outbound outbound = outboundRepository.findById(id)
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage("error.outbound.notFound", new Object[]{id},
+                            LocaleContextHolder.getLocale());
+                    return new ResourceNotFoundException("OUTBOUND_NOT_FOUND", message);
+                });
+        Inbound inbound = outbound.getInbound();
+        Integer totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+        int availableQuantity = inbound.getQuantity() - totalShipped;
+
+       return outboundMapper.toOutboundDetailResponse(outbound, availableQuantity);
 
 
     }
