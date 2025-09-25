@@ -48,8 +48,8 @@ public class OutboundServiceImpl implements OutboundService {
 
         Integer totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
         int availableQuantity = inbound.getQuantity() - totalShipped;
-
-        if(request.quantity() > availableQuantity){
+        Integer reqQuantity = request.quantity();
+        if(reqQuantity != null && reqQuantity > availableQuantity){
             String message = messageSource.getMessage("error.outbound.insufficientQuantity",
                     new Object[]{inbound.getId(), availableQuantity, request.quantity()},
                     LocaleContextHolder.getLocale());
@@ -63,14 +63,18 @@ public class OutboundServiceImpl implements OutboundService {
         newOutbound.setShippingMethod(ShippingMethod.fromCode(request.shippingMethod()));
         Outbound savedOutbound = outboundRepository.save(newOutbound);
 
-        int newTotalShipped = totalShipped + request.quantity();
-        if(newTotalShipped >= inbound.getQuantity()){
-            inbound.setStatus(InboundStatus.FULLY_OUTBOUND);
-        } else {
-            inbound.setStatus(InboundStatus.PARTIALLY_OUTBOUND);
+        if(reqQuantity != null) {
+            int newTotalShipped = totalShipped + reqQuantity;
+            if(newTotalShipped >= inbound.getQuantity()){
+                inbound.setStatus(InboundStatus.FULLY_OUTBOUND);
+            } else {
+                inbound.setStatus(InboundStatus.PARTIALLY_OUTBOUND);
+            }
+            inboundRepository.save(inbound);
+
         }
 
-        inboundRepository.save(inbound);
+
 
         return outboundMapper.toOutboundResponse(savedOutbound);
 

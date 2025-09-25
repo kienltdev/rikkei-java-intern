@@ -10,7 +10,6 @@ public record OutboundResponse(
         Integer quantity,
         ShippingMethod shippingMethod,
         LocalDate shippingDate,
-        String status,
         boolean editable
 ) {
 }
