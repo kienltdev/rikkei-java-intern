@@ -3,6 +3,7 @@ package intern.rikkei.warehousesystem.mapper;
 import intern.rikkei.warehousesystem.dto.response.InboundSummaryResponse;
 import intern.rikkei.warehousesystem.dto.response.OutboundDetailResponse;
 import intern.rikkei.warehousesystem.dto.response.OutboundResponse;
+import intern.rikkei.warehousesystem.dto.response.OutboundSummaryResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Outbound;
 import org.mapstruct.Context;
@@ -11,6 +12,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Mapper(componentModel = "spring", imports = {LocalDate.class})
 public interface OutboundMapper {
@@ -26,6 +28,9 @@ public interface OutboundMapper {
     @Mapping(target = "totalQuantity", source = "quantity")
     @Mapping(target = "quantityAvailable", expression = "java(quantityAvailable)")
     InboundSummaryResponse  toInboundSummaryResponse(Inbound inbound, @Context Integer quantityAvailable);
+
+    OutboundSummaryResponse toOutboundSummaryResponse(Outbound outbound);
+    List<OutboundSummaryResponse> toOutboundSummaryResponse(List<Outbound> outbound);
 
     @Named("isEditable")
     default boolean isEditable(LocalDate shippingDate) {

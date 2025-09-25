@@ -5,6 +5,7 @@ import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
 import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
+import intern.rikkei.warehousesystem.dto.response.InboundDetailResponse;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
 import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
 import org.springframework.data.domain.Page;
@@ -18,4 +19,5 @@ public interface InboundService {
     ImportResultResponse importFromExcel(MultipartFile file);
     void deleteInbound(Long id);
     Page<InboundStatisticsResponse> getInboundStatistics(InboundStatisticsRequest request, Pageable pageable);
+    InboundDetailResponse findInboundDetailById(Long id);
 }

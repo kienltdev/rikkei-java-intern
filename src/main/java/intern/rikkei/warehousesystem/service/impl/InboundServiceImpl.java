@@ -5,9 +5,11 @@ import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
 import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
+import intern.rikkei.warehousesystem.dto.response.InboundDetailResponse;
 import intern.rikkei.warehousesystem.dto.response.InboundResponse;
 import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
+import intern.rikkei.warehousesystem.entity.Outbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
@@ -15,6 +17,7 @@ import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import intern.rikkei.warehousesystem.exception.ResourceNotFoundException;
 import intern.rikkei.warehousesystem.mapper.InboundMapper;
 import intern.rikkei.warehousesystem.repository.InboundRepository;
+import intern.rikkei.warehousesystem.repository.OutboundRepository;
 import intern.rikkei.warehousesystem.repository.specification.InboundSpecification;
 import intern.rikkei.warehousesystem.service.InboundImportService;
 import intern.rikkei.warehousesystem.service.InboundService;
@@ -41,6 +44,7 @@ public class InboundServiceImpl implements InboundService {
     private final MessageSource messageSource;
     private final List<FileParserStrategy> parsers;
     private final InboundImportService inboundImportService;
+    private final OutboundRepository outboundRepository;
 
     @Override
     @Transactional
@@ -132,6 +136,22 @@ public class InboundServiceImpl implements InboundService {
                 SupplierCd.fromCode(request.getSupplierCd().toUpperCase()) : null;
 
         return inboundRepository.findInboundStatistics(productType, supplierCd, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public InboundDetailResponse findInboundDetailById(Long id) {
+        Inbound inbound = inboundRepository.findById(id)
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage("error.inbound.notFound", new Object[]{id},
+                            LocaleContextHolder.getLocale());
+                    return new ResourceNotFoundException("INBOUND_NOT_FOUND", message);
+                });
+        List<Outbound> outbounds = outboundRepository.findByInboundId(id);
+
+        int quantityOutBound = outboundRepository.sumQuantityByInboundId(id);
+        int quantityAvailable = inbound.getQuantity() - quantityOutBound;
+        return inboundMapper.toInboundDetailResponse(inbound, quantityAvailable, outbounds);
     }
 }
 

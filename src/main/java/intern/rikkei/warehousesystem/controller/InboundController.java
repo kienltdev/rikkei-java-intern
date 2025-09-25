@@ -4,10 +4,7 @@ import intern.rikkei.warehousesystem.dto.request.InboundRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
-import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
-import intern.rikkei.warehousesystem.dto.response.InboundResponse;
-import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
-import intern.rikkei.warehousesystem.dto.response.PaginatedResponse;
+import intern.rikkei.warehousesystem.dto.response.*;
 import intern.rikkei.warehousesystem.service.InboundService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -95,6 +92,13 @@ public class InboundController {
                 statisticsPage.getTotalElements()
         );
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<InboundDetailResponse>  getInboundDetail(@PathVariable Long id) {
+        InboundDetailResponse response = inboundService.findInboundDetailById(id);
         return ResponseEntity.ok(response);
     }
 
