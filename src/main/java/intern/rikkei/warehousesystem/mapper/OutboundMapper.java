@@ -1,20 +1,20 @@
 package intern.rikkei.warehousesystem.mapper;
 
+import intern.rikkei.warehousesystem.dto.request.UpdateOutboundRequest;
 import intern.rikkei.warehousesystem.dto.response.InboundSummaryResponse;
 import intern.rikkei.warehousesystem.dto.response.OutboundDetailResponse;
 import intern.rikkei.warehousesystem.dto.response.OutboundResponse;
 import intern.rikkei.warehousesystem.dto.response.OutboundSummaryResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Outbound;
-import org.mapstruct.Context;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import intern.rikkei.warehousesystem.enums.ShippingMethod;
+import org.mapstruct.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Mapper(componentModel = "spring", imports = {LocalDate.class})
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        imports = {LocalDate.class})
 public interface OutboundMapper {
     @Mapping(source = "inbound.id", target = "inbId")
     @Mapping(source = "shippingDate", target = "editable", qualifiedByName = "isEditable")
@@ -32,9 +32,20 @@ public interface OutboundMapper {
     OutboundSummaryResponse toOutboundSummaryResponse(Outbound outbound);
     List<OutboundSummaryResponse> toOutboundSummaryResponse(List<Outbound> outbound);
 
+
+    @Mapping(source = "shippingMethod", target = "shippingMethod", qualifiedByName = "mapShippingMethod")
+    void updateOutboundFromRequest(UpdateOutboundRequest request, @MappingTarget Outbound outbound);
     @Named("isEditable")
     default boolean isEditable(LocalDate shippingDate) {
         return shippingDate == null || shippingDate.isBefore(LocalDate.now());
+    }
+
+    @Named("mapShippingMethod")
+    default ShippingMethod mapShippingMethod(String shippingMethod) {
+        if (shippingMethod == null) {
+            return null;
+        }
+        return ShippingMethod.fromCode(shippingMethod);
     }
 
 }

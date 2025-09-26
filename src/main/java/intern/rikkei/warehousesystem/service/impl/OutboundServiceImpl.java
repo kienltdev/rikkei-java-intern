@@ -2,6 +2,7 @@ package intern.rikkei.warehousesystem.service.impl;
 
 import intern.rikkei.warehousesystem.dto.request.OutboundRequest;
 import intern.rikkei.warehousesystem.dto.request.OutboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.request.UpdateOutboundRequest;
 import intern.rikkei.warehousesystem.dto.response.OutboundDetailResponse;
 import intern.rikkei.warehousesystem.dto.response.OutboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
@@ -21,6 +22,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -93,5 +98,55 @@ public class OutboundServiceImpl implements OutboundService {
        return outboundMapper.toOutboundDetailResponse(outbound, availableQuantity);
 
 
+    }
+
+    @Override
+    @Transactional
+    public OutboundResponse update(Long id, UpdateOutboundRequest request){
+        Outbound outbound = outboundRepository.findById(id)
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage("error.outbound.notFound", new Object[]{id},
+                            LocaleContextHolder.getLocale());
+                    return new ResourceNotFoundException("OUTBOUND_NOT_FOUND", message);
+                });
+        if(outbound.getShippingDate() != null && !LocalDate.now().isBefore(outbound.getShippingDate())){
+            String message = messageSource.getMessage("error.outbound.updateNotAllowed", new Object[]{outbound.getShippingDate()},
+                            LocaleContextHolder.getLocale());
+            throw new InvalidOperationException("OUTBOUND_UPDATE_NOT_ALLOWED", message);
+        }
+
+        Integer oldQuantity = Optional.ofNullable(outbound.getQuantity()).orElse(0);
+        Integer newQuantity = request.quantity();
+        boolean quantityChanged = !Objects.equals(oldQuantity, newQuantity);
+        if(quantityChanged){
+            Inbound inbound = outbound.getInbound();
+            Integer totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+            int availableQuantity = inbound.getQuantity() - (totalShipped - oldQuantity);
+            if(newQuantity > availableQuantity){
+                String message = messageSource.getMessage("error.outbound.insufficientQuantity", new Object[]{inbound.getId(),
+                        availableQuantity, newQuantity}, LocaleContextHolder.getLocale());
+                throw new InvalidOperationException("INSUFFICIENT_QUANTITY", message);
+            }
+        }
+
+        outboundMapper.updateOutboundFromRequest(request, outbound);
+
+        Outbound savedOutbound = outboundRepository.save(outbound);
+
+        if(quantityChanged){
+            Inbound inbound = outbound.getInbound();
+            Integer newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+            if(newTotalShipped >= inbound.getQuantity()){
+                inbound.setStatus(InboundStatus.FULLY_OUTBOUND);
+            } else if(newTotalShipped > 0){
+                inbound.setStatus(InboundStatus.PARTIALLY_OUTBOUND);
+            } else {
+                inbound.setStatus(InboundStatus.NOT_OUTBOUND);
+            }
+
+            inboundRepository.save(inbound);
+        }
+
+        return outboundMapper.toOutboundResponse(savedOutbound);
     }
 }
