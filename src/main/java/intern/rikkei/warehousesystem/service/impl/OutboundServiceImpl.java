@@ -135,18 +135,52 @@ public class OutboundServiceImpl implements OutboundService {
 
         if(quantityChanged){
             Inbound inbound = outbound.getInbound();
+            Integer totalQuantity = Optional.ofNullable(inbound.getQuantity()).orElse(0);
             Integer newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
-            if(newTotalShipped >= inbound.getQuantity()){
-                inbound.setStatus(InboundStatus.FULLY_OUTBOUND);
-            } else if(newTotalShipped > 0){
-                inbound.setStatus(InboundStatus.PARTIALLY_OUTBOUND);
-            } else {
+            if(newTotalShipped <= 0){
                 inbound.setStatus(InboundStatus.NOT_OUTBOUND);
+            } else if(newTotalShipped >= totalQuantity){
+                inbound.setStatus(InboundStatus.FULLY_OUTBOUND);
+            } else {
+                inbound.setStatus(InboundStatus.PARTIALLY_OUTBOUND);
             }
 
             inboundRepository.save(inbound);
         }
 
         return outboundMapper.toOutboundResponse(savedOutbound);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id){
+        Outbound outbound = outboundRepository.findById(id)
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage("error.outbound.notFound", new Object[]{id},
+                            LocaleContextHolder.getLocale());
+                    return new ResourceNotFoundException("OUTBOUND_NOT_FOUND", message);
+                });
+        if(outbound.getShippingDate() != null && !LocalDate.now().isBefore(outbound.getShippingDate())){
+            String message = messageSource.getMessage("error.outbound.deleteNotAllowed", new Object[]{outbound.getShippingDate()},
+                    LocaleContextHolder.getLocale());
+            throw new InvalidOperationException("OUTBOUND_DELETE_NOT_ALLOWED", message);
+        }
+        Inbound inbound = outbound.getInbound();
+        outboundRepository.delete(outbound);
+
+        Integer newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+
+        Integer totalQuantity = Optional.ofNullable(inbound.getQuantity()).orElse(0);
+
+        if(newTotalShipped <= 0){
+            inbound.setStatus(InboundStatus.NOT_OUTBOUND);
+        } else if(newTotalShipped >= totalQuantity){
+            inbound.setStatus(InboundStatus.FULLY_OUTBOUND);
+        } else {
+            inbound.setStatus(InboundStatus.PARTIALLY_OUTBOUND);
+        }
+
+        inboundRepository.save(inbound);
+
     }
 }

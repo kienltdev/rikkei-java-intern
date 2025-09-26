@@ -13,5 +13,6 @@ public interface OutboundService {
     OutboundResponse create(OutboundRequest request);
     OutboundDetailResponse findById(Long id);
     OutboundResponse update(Long id, UpdateOutboundRequest request);
+    void delete(Long id);
 
 }

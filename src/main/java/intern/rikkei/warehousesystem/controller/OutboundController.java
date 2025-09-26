@@ -62,5 +62,11 @@ public class OutboundController {
         OutboundResponse response = outboundService.update(id, request);
         return ResponseEntity.ok(response);
     }
-    
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<Void> deleteOutbound(@PathVariable Long id) {
+        outboundService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
