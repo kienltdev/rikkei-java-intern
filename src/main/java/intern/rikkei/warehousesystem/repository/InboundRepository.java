@@ -25,14 +25,27 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
             GROUP BY i.productType, i.supplierCd
             """,
             countQuery = """
-            SELECT COUNT(DISTINCT CONCAT(i.productType, i.supplierCd))
-            FROM Inbound i
-            WHERE (:productType IS NULL OR i.productType = :productType)
-              AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
-            """)
+                    SELECT COUNT(DISTINCT CONCAT(i.productType, i.supplierCd))
+                    FROM Inbound i
+                    WHERE (:productType IS NULL OR i.productType = :productType)
+                      AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
+                    """)
     Page<InboundStatisticsResponse> findInboundStatistics(
             @Param("productType") ProductType productType,
             @Param("supplierCd") SupplierCd supplierCd,
             Pageable pageable
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(i.quantity), 0L) 
+                        FROM Inbound i
+                                    WHERE (:productType IS NULL OR i.productType = :productType)
+                                                AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
+                                                            AND (:invoice IS NULL OR i.invoice = :invoice)
+            """)
+    Long sumQuantityByFilters(
+            @Param("productType") ProductType productType,
+            @Param("supplierCd") SupplierCd supplierCd,
+            @Param("invoice") String invoice
     );
 }
