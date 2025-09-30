@@ -1,6 +1,7 @@
 package intern.rikkei.warehousesystem.repository;
 
 import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
+import intern.rikkei.warehousesystem.dto.response.InventoryDetailResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
@@ -48,4 +49,43 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
             @Param("supplierCd") SupplierCd supplierCd,
             @Param("invoice") String invoice
     );
+
+    @Query(
+            value = """
+                SELECT new intern.rikkei.warehousesystem.dto.response.InventoryDetailResponse(
+                    i.id,
+                    i.invoice,
+                    i.productType,
+                    i.supplierCd,
+                    i.quantity,
+                    (i.quantity - COALESCE(SUM(o.quantity), 0L)) AS availableQuantity,
+                    i.status
+                )
+                FROM Inbound i
+                LEFT JOIN Outbound o ON o.inbound.id = i.id
+                WHERE (:inbId IS NULL OR i.id = :inbId)
+                AND (:invoice IS NULL OR i.invoice LIKE %:invoice%)
+                AND (:productType IS NULL OR i.productType = :productType)
+                AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
+                GROUP BY i.id, i.invoice, i.productType, i.supplierCd, i.quantity, i.status
+    
+                """,
+            countQuery = """
+                SELECT COUNT(i)
+                FROM Inbound i
+                WHERE (:inbId IS NULL OR i.id = :inbId)
+                AND (:invoice IS NULL OR i.invoice LIKE %:invoice%)
+                AND (:productType IS NULL OR i.productType = :productType)
+                AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
+                """
+    )
+    Page<InventoryDetailResponse> findInventoryDetails(
+            @Param("inbId") Long inbId,
+            @Param("invoice") String invoice,
+            @Param("productType") ProductType productType,
+            @Param("supplierCd") SupplierCd supplierCd,
+            Pageable pageable
+
+    );
+
 }
