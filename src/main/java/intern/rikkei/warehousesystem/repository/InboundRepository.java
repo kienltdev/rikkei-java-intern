@@ -98,7 +98,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
 //    @Query("SELECT COALESCE(SUM(i.quantity), 0L) FROM Inbound i WHERE i.receiveDate >= :startDate AND i.receiveDate <= :endDate")
 //    Long sumQuantityByReceiveDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     @Query("""
-            SELECT MONTH(i.receiveDate), SUM(i.quantity)
+            SELECT new intern.rikkei.warehousesystem.dto.response.MonthlyQuantity(MONTH(i.receiveDate), SUM(i.quantity))
             FROM Inbound i
             WHERE YEAR(i.receiveDate) = :year
             GROUP BY MONTH(i.receiveDate)

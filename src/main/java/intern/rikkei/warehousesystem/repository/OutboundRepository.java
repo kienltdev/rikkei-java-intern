@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface OutboundRepository extends JpaRepository<Outbound, Long>, JpaSpecificationExecutor<Outbound> {
-    @Query("SELECT COALESCE(SUM(o.quantity), 0) FROM Outbound o WHERE o.inbound.id = :inboundId")
+    @Query("SELECT COALESCE(SUM(o.quantity), 0L) FROM Outbound o WHERE o.inbound.id = :inboundId")
     Integer sumQuantityByInboundId(@Param("inboundId") Long inboundId);
     List<Outbound> findByInboundId(Long inboundId);
 
