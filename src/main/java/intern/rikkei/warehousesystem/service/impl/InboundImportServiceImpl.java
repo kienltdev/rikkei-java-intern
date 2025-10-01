@@ -13,6 +13,8 @@ import intern.rikkei.warehousesystem.service.parser.InboundData;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -33,7 +35,7 @@ public class InboundImportServiceImpl implements InboundImportService {
     private final Validator validator;
     private final InboundMapper inboundMapper;
     private final InboundRepository inboundRepository;
-
+    private final MessageSource messageSource;
     @Override
     @Transactional
     public ImportResultResponse importInbounds(MultipartFile file) {
@@ -80,7 +82,12 @@ public class InboundImportServiceImpl implements InboundImportService {
         return parsers.stream()
                 .filter(p -> p.supports(contentType))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported file type: " + contentType));
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage("error.file.unsupportedType",
+                            new Object[]{contentType},
+                            LocaleContextHolder.getLocale());
+                    return new InvalidOperationException("UNSUPPORTED_FILE_TYPE", message);
+                });
     }
 
     private List<InboundData> parseFile(MultipartFile file, FileParserStrategy parser) {

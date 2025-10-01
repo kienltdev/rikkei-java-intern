@@ -37,7 +37,7 @@ public interface OutboundMapper {
     void updateOutboundFromRequest(UpdateOutboundRequest request, @MappingTarget Outbound outbound);
     @Named("isEditable")
     default boolean isEditable(LocalDate shippingDate) {
-        return shippingDate == null || shippingDate.isBefore(LocalDate.now());
+        return shippingDate == null || LocalDate.now().isBefore(shippingDate);
     }
 
     @Named("mapShippingMethod")

@@ -16,7 +16,7 @@ public interface InboundService {
     InboundResponse createInbound(InboundRequest request);
     Page<InboundResponse> findAll(InboundSearchRequest request, Pageable pageable);
     InboundResponse updateInbound(Long id, UpdateInboundRequest request);
-    ImportResultResponse importFromExcel(MultipartFile file);
+    ImportResultResponse importFromFile(MultipartFile file);
     void deleteInbound(Long id);
     PaginatedInboundStatisticsResponse getInboundStatistics(InboundStatisticsRequest request, Pageable pageable);
     InboundDetailResponse findInboundDetailById(Long id);

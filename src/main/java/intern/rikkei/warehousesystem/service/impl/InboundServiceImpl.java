@@ -98,7 +98,7 @@ public class InboundServiceImpl implements InboundService {
 
 
     @Override
-    public ImportResultResponse importFromExcel(MultipartFile file) {
+    public ImportResultResponse importFromFile(MultipartFile file) {
         return inboundImportService.importInbounds(file);
     }
 
