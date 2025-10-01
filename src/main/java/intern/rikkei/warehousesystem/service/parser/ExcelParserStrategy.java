@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,14 +48,16 @@ public class ExcelParserStrategy implements FileParserStrategy {
 
     private String getCellValueAsString(Cell cell) {
         if (cell == null) return "";
+        DataFormatter formatter = new DataFormatter();
         switch (cell.getCellType()) {
             case STRING: return cell.getStringCellValue().trim();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getLocalDateTimeCellValue().toLocalDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    return cell.getLocalDateTimeCellValue().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                 }
-                return String.valueOf((long) cell.getNumericCellValue());
-            default: return "";
+                return formatter.formatCellValue(cell);
+            default:
+                return formatter.formatCellValue(cell);
         }
     }
 }
