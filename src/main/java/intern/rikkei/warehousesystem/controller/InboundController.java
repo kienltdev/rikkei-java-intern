@@ -5,9 +5,12 @@ import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
 import intern.rikkei.warehousesystem.dto.response.*;
+import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import intern.rikkei.warehousesystem.service.InboundService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class InboundController {
 
     private final InboundService inboundService;
+    private final MessageSource messageSource;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @PostMapping
@@ -63,10 +67,11 @@ public class InboundController {
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ImportResultResponse> importInbounds(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-
+            String message = messageSource.getMessage("error.file.empty", null, LocaleContextHolder.getLocale());
+            throw new InvalidOperationException("EMPTY_FILE_UPLOADED", message);
         }
 
-        ImportResultResponse result = inboundService.importFromExcel(file);
+        ImportResultResponse result = inboundService.importFromFile(file);
         return ResponseEntity.ok(result);
     }
 

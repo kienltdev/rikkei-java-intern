@@ -26,7 +26,7 @@ public class ReportController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MonthlyInventoryReportResponse> getMonthlyInventoryReport(
             @RequestParam
-            @NotNull(message = "{validation.yaer.notNull}")
+            @NotNull(message = "{validation.year.notNull}")
             @Min(value = 1970, message = "{validation.year.min}")
             Integer year
     ) {
