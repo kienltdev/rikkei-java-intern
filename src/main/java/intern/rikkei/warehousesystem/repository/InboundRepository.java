@@ -2,6 +2,7 @@ package intern.rikkei.warehousesystem.repository;
 
 import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
 import intern.rikkei.warehousesystem.dto.response.InventoryDetailResponse;
+import intern.rikkei.warehousesystem.dto.response.MonthlyQuantity;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
@@ -11,6 +12,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpecificationExecutor<Inbound> {
     @Query(value = """
@@ -87,5 +91,18 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
             Pageable pageable
 
     );
+
+    @Query("SELECT COALESCE(SUM(i.quantity), 0L) FROM Inbound i WHERE i.receiveDate < :date")
+    Long sumQuantityByReceiveDateBefore(@Param("date") LocalDate date);
+
+//    @Query("SELECT COALESCE(SUM(i.quantity), 0L) FROM Inbound i WHERE i.receiveDate >= :startDate AND i.receiveDate <= :endDate")
+//    Long sumQuantityByReceiveDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    @Query("""
+            SELECT MONTH(i.receiveDate), SUM(i.quantity)
+            FROM Inbound i
+            WHERE YEAR(i.receiveDate) = :year
+            GROUP BY MONTH(i.receiveDate)
+""")
+    List<MonthlyQuantity> findMonthlySummariesByYear(@Param("year") int year);
 
 }
