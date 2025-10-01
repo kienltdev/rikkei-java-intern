@@ -79,18 +79,10 @@ public class InboundController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("/statistics")
-    public ResponseEntity<PaginatedResponse<InboundStatisticsResponse>> getStatistics(
+    public ResponseEntity<PaginatedInboundStatisticsResponse> getStatistics(
             @Valid InboundStatisticsRequest request, Pageable pageable) {
 
-        Page<InboundStatisticsResponse> statisticsPage = inboundService.getInboundStatistics(request, pageable);
-
-        PaginatedResponse<InboundStatisticsResponse> response = new PaginatedResponse<>(
-                statisticsPage.getContent(),
-                statisticsPage.getNumber() + 1,
-                statisticsPage.getSize(),
-                statisticsPage.getTotalPages(),
-                statisticsPage.getTotalElements()
-        );
+        PaginatedInboundStatisticsResponse response = inboundService.getInboundStatistics(request, pageable);
 
         return ResponseEntity.ok(response);
     }

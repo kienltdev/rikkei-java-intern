@@ -4,10 +4,7 @@ import intern.rikkei.warehousesystem.dto.request.InboundRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
 import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
-import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
-import intern.rikkei.warehousesystem.dto.response.InboundDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.InboundResponse;
-import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
+import intern.rikkei.warehousesystem.dto.response.*;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Outbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
@@ -127,7 +124,7 @@ public class InboundServiceImpl implements InboundService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<InboundStatisticsResponse> getInboundStatistics(InboundStatisticsRequest request, Pageable pageable) {
+    public PaginatedInboundStatisticsResponse getInboundStatistics(InboundStatisticsRequest request, Pageable pageable) {
 
         ProductType productType = StringUtils.hasText(request.getProductType()) ?
                 ProductType.valueOf(request.getProductType().toUpperCase()) : null;
@@ -135,7 +132,18 @@ public class InboundServiceImpl implements InboundService {
         SupplierCd supplierCd = StringUtils.hasText(request.getSupplierCd()) ?
                 SupplierCd.fromCode(request.getSupplierCd().toUpperCase()) : null;
 
-        return inboundRepository.findInboundStatistics(productType, supplierCd, pageable);
+        Page<InboundStatisticsResponse> statisticsPage = inboundRepository.findInboundStatistics(productType, supplierCd, pageable);
+        Long grandTotalQuantity = inboundRepository.sumQuantityByFilters(productType, supplierCd, null);
+
+
+        return new PaginatedInboundStatisticsResponse(
+                statisticsPage.getContent(),
+                grandTotalQuantity,
+                statisticsPage.getNumber() + 1,
+                statisticsPage.getSize(),
+                statisticsPage.getTotalPages(),
+                statisticsPage.getTotalElements()
+        );
     }
 
     @Override
