@@ -1,10 +1,13 @@
 package intern.rikkei.warehousesystem.controller;
 
 import intern.rikkei.warehousesystem.dto.response.MonthlyInventoryReportResponse;
+import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import intern.rikkei.warehousesystem.service.ReportService;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +24,7 @@ import java.time.Year;
 @Validated
 public class ReportController {
     private final ReportService reportService;
+    private final MessageSource messageSource;
 
     @GetMapping("/monthly-inventory")
     @PreAuthorize("hasRole('ADMIN')")
@@ -31,7 +35,10 @@ public class ReportController {
             Integer year
     ) {
         if(year > Year.now().getValue()) {
-            // tra ra thong bao
+            String message = messageSource.getMessage("validation.year.future",
+                    new Object[]{year},
+                    LocaleContextHolder.getLocale());
+            throw new InvalidOperationException("INVALID_YEAR", message);
         }
 
         MonthlyInventoryReportResponse response = reportService.getMonthlyInventoryReport(year);

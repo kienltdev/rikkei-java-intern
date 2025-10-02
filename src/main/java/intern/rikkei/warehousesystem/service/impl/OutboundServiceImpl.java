@@ -52,8 +52,8 @@ public class OutboundServiceImpl implements OutboundService {
                     return new ResourceNotFoundException("INBOUND_NOT_FOUND", message);
                 });
 
-        Integer totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
-        int availableQuantity = inbound.getQuantity() - totalShipped;
+        Long totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+        long availableQuantity = inbound.getQuantity() - totalShipped;
         Integer reqQuantity = request.quantity();
         if(reqQuantity != null && reqQuantity > availableQuantity){
             String message = messageSource.getMessage("error.outbound.insufficientQuantity",
@@ -70,7 +70,7 @@ public class OutboundServiceImpl implements OutboundService {
         Outbound savedOutbound = outboundRepository.save(newOutbound);
 
         if(reqQuantity != null) {
-            int newTotalShipped = totalShipped + reqQuantity;
+            long newTotalShipped = totalShipped + reqQuantity;
             if(newTotalShipped >= inbound.getQuantity()){
                 inbound.setStatus(InboundStatus.FULLY_OUTBOUND);
             } else {
@@ -92,8 +92,8 @@ public class OutboundServiceImpl implements OutboundService {
                     return new ResourceNotFoundException("OUTBOUND_NOT_FOUND", message);
                 });
         Inbound inbound = outbound.getInbound();
-        Integer totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
-        int availableQuantity = inbound.getQuantity() - totalShipped;
+        Long totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+        long availableQuantity = inbound.getQuantity() - totalShipped;
 
        return outboundMapper.toOutboundDetailResponse(outbound, availableQuantity);
 
@@ -117,12 +117,12 @@ public class OutboundServiceImpl implements OutboundService {
 
         Integer oldQuantity = Optional.ofNullable(outbound.getQuantity()).orElse(0);
         Integer newQuantity = request.quantity();
-        boolean quantityChanged = !Objects.equals(oldQuantity, newQuantity);
+        boolean quantityChanged = (newQuantity != null) && !Objects.equals(oldQuantity, newQuantity);
         if(quantityChanged){
             Inbound inbound = outbound.getInbound();
-            Integer totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
-            int availableQuantity = inbound.getQuantity() - (totalShipped - oldQuantity);
-            if(newQuantity > availableQuantity){
+            Long totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+            long availableQuantity = inbound.getQuantity() - (totalShipped - oldQuantity);
+                if(newQuantity > availableQuantity){
                 String message = messageSource.getMessage("error.outbound.insufficientQuantity", new Object[]{inbound.getId(),
                         availableQuantity, newQuantity}, LocaleContextHolder.getLocale());
                 throw new InvalidOperationException("INSUFFICIENT_QUANTITY", message);
@@ -136,7 +136,7 @@ public class OutboundServiceImpl implements OutboundService {
         if(quantityChanged){
             Inbound inbound = outbound.getInbound();
             Integer totalQuantity = Optional.ofNullable(inbound.getQuantity()).orElse(0);
-            Integer newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+            Long newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
             if(newTotalShipped <= 0){
                 inbound.setStatus(InboundStatus.NOT_OUTBOUND);
             } else if(newTotalShipped >= totalQuantity){
@@ -168,7 +168,7 @@ public class OutboundServiceImpl implements OutboundService {
         Inbound inbound = outbound.getInbound();
         outboundRepository.delete(outbound);
 
-        Integer newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
+        Long newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
 
         Integer totalQuantity = Optional.ofNullable(inbound.getQuantity()).orElse(0);
 

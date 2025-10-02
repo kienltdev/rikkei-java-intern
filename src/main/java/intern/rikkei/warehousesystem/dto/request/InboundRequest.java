@@ -4,8 +4,9 @@ import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
 import intern.rikkei.warehousesystem.validation.annotation.ValidEnum;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
@@ -23,9 +24,10 @@ public record InboundRequest(
         @ValidEnum(enumClass = SupplierCd.class, message = "{validation.supplierCd.invalid}", ignoreCase = true)
         String  supplierCd,
 
+        @PastOrPresent(message = "{validation.receiveDate.pastOrPresent}")
         LocalDate receiveDate,
 
-        @PositiveOrZero(message = "{validation.quantity.positiveOrZero}")
+        @Positive(message = "{validation.quantity.positive}")
         Integer quantity
 ) {
 }

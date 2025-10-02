@@ -47,7 +47,7 @@ public interface InboundMapper {
     @Mapping(target = "editable", expression = "java(inbound.getStatus() == intern.rikkei.warehousesystem.enums.InboundStatus.NOT_OUTBOUND)")
     @Mapping(target = "quantityAvailable", source = "quantityAvailable")
     @Mapping(target = "outbounds", source = "outbounds")
-    InboundDetailResponse toInboundDetailResponse(Inbound inbound, Integer quantityAvailable, List<Outbound>  outbounds);
+    InboundDetailResponse toInboundDetailResponse(Inbound inbound, Long quantityAvailable, List<Outbound>  outbounds);
 
     default ProductType toProductType(String productTypeStr) {
         if (StringUtils.hasText(productTypeStr)) {

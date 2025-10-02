@@ -43,7 +43,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(readOnly = true)
     public Page<InventoryDetailResponse> getInventoryDetails(InventoryListRequest request, Pageable pageable) {
-        ProductType productType = StringUtils.hasText(request.productType()) ? ProductType.valueOf(request.productType()) : null;
+        ProductType productType = StringUtils.hasText(request.productType()) ? ProductType.valueOf(request.productType().toUpperCase()) : null;
         SupplierCd supplierCd = StringUtils.hasText(request.supplierCd()) ? SupplierCd.fromCode(request.supplierCd()) : null;
 
 

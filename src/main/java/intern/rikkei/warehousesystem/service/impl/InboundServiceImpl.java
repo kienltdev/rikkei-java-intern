@@ -157,8 +157,8 @@ public class InboundServiceImpl implements InboundService {
                 });
         List<Outbound> outbounds = outboundRepository.findByInboundId(id);
 
-        int quantityOutBound = outboundRepository.sumQuantityByInboundId(id);
-        int quantityAvailable = inbound.getQuantity() - quantityOutBound;
+        long quantityOutBound = outboundRepository.sumQuantityByInboundId(id);
+        long quantityAvailable = inbound.getQuantity() - quantityOutBound;
         return inboundMapper.toInboundDetailResponse(inbound, quantityAvailable, outbounds);
     }
 }

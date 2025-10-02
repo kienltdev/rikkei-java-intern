@@ -58,7 +58,7 @@ public class OutboundController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<OutboundResponse> updateInbound(@PathVariable Long id, @Valid @RequestBody UpdateOutboundRequest request) {
+    public ResponseEntity<OutboundResponse> updateOutbound(@PathVariable Long id, @Valid @RequestBody UpdateOutboundRequest request) {
         OutboundResponse response = outboundService.update(id, request);
         return ResponseEntity.ok(response);
     }

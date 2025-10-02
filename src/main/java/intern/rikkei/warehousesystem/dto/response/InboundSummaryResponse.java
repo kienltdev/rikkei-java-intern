@@ -6,8 +6,8 @@ public record InboundSummaryResponse(
         Long id,
         String invoice,
         ProductType productType,
-        Integer totalQuantity,
-        Integer quantityAvailable
+        Long totalQuantity,
+        Long quantityAvailable
 ) {
 
 }

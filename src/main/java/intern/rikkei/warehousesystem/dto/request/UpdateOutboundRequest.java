@@ -1,6 +1,7 @@
 package intern.rikkei.warehousesystem.dto.request;
 
 import intern.rikkei.warehousesystem.validation.annotation.ValidShippingMethod;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ public record UpdateOutboundRequest(
         @ValidShippingMethod
         String shippingMethod,
 
+        @FutureOrPresent(message = "{validation.shippingDate.futureOrPresent}")
         LocalDate shippingDate
 
 ) {

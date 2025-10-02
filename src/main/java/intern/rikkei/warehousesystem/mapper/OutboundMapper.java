@@ -22,12 +22,12 @@ public interface OutboundMapper {
 
     @Mapping(source = "outbound.inbound", target = "inboundSummary")
     @Mapping(source = "outbound.shippingDate", target = "editable", qualifiedByName = "isEditable")
-    OutboundDetailResponse  toOutboundDetailResponse(Outbound outbound, @Context Integer quantityAvailable);
+    OutboundDetailResponse  toOutboundDetailResponse(Outbound outbound, @Context Long quantityAvailable);
 
 
     @Mapping(target = "totalQuantity", source = "quantity")
     @Mapping(target = "quantityAvailable", expression = "java(quantityAvailable)")
-    InboundSummaryResponse  toInboundSummaryResponse(Inbound inbound, @Context Integer quantityAvailable);
+    InboundSummaryResponse  toInboundSummaryResponse(Inbound inbound, @Context Long quantityAvailable);
 
     OutboundSummaryResponse toOutboundSummaryResponse(Outbound outbound);
     List<OutboundSummaryResponse> toOutboundSummaryResponse(List<Outbound> outbound);

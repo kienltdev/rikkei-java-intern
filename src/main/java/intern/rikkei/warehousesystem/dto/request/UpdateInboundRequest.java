@@ -4,7 +4,7 @@ import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
 import intern.rikkei.warehousesystem.validation.annotation.ValidEnum;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
@@ -30,7 +30,7 @@ public record UpdateInboundRequest(
 
         LocalDate receiveDate,
 
-        @PositiveOrZero(message = "{validation.quantity.positiveOrZero}")
+        @Positive(message = "{validation.quantity.positive}")
         Integer quantity
 
 ) {
