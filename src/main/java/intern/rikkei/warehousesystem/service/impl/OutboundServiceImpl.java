@@ -45,7 +45,7 @@ public class OutboundServiceImpl implements OutboundService {
     @Override
     @Transactional
     public OutboundResponse create(OutboundRequest request){
-        Inbound inbound = inboundRepository.findById(request.inbId())
+        Inbound inbound = inboundRepository.findByIdAndLock(request.inbId())
                 .orElseThrow(() -> {
                     String message = messageSource.getMessage("error.inbound.notFound", new Object[]{request.inbId()},
                             LocaleContextHolder.getLocale());

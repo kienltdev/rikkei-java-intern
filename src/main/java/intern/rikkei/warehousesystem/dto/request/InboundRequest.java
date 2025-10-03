@@ -1,5 +1,6 @@
 package intern.rikkei.warehousesystem.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
 import intern.rikkei.warehousesystem.validation.annotation.ValidEnum;
@@ -25,6 +26,7 @@ public record InboundRequest(
         String  supplierCd,
 
         @PastOrPresent(message = "{validation.receiveDate.pastOrPresent}")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         LocalDate receiveDate,
 
         @Positive(message = "{validation.quantity.positive}")

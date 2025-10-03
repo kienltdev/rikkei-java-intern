@@ -1,5 +1,6 @@
 package intern.rikkei.warehousesystem.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
@@ -13,6 +14,7 @@ public record InboundDetailResponse(
         String invoice,
         ProductType productType,
         SupplierCd supplierCd,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         LocalDate receiveDate,
         InboundStatus status,
         Integer quantity,

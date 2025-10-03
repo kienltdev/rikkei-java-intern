@@ -22,7 +22,6 @@ public class Inbound extends AuditableEntity {
     @Column(name = "invoice", length = 9, nullable = false)
     private String invoice;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "product_type", length = 50, nullable = false)
     private ProductType productType;
 
