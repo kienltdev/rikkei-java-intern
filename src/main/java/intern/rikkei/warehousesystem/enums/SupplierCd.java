@@ -8,18 +8,17 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 public enum SupplierCd {
-    VN("VN", "Việt Nam"),
-    TH("TH", "Thái Lan"),
-    MY("MY", "Malaysia"),
-    ID("ID", "Indonesia"),
-    SG("SG", "Singapore"),
-    PH("PH", "Philippines"),
-    LA("LA", "Lào"),
-    MM("MM", "Myanmar"),
-    TL("TL", "Đông Timor");
+    VIETNAM("VN"),
+    THAILAND("TH"),
+    MALAYSIA("MY"),
+    INDONESIA("ID"),
+    SINGAPORE("SG"),
+    PHILIPPINES("PH"),
+    LAOS("LA"),
+    MYANMAR("MM"),
+    TIMOR_LESTE("TL");
 
     private final String code;
-    private final String name;
 
     public static SupplierCd fromCode(String code) {
         if (code == null) {

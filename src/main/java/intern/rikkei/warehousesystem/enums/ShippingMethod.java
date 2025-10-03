@@ -9,13 +9,12 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 public enum ShippingMethod {
-    AIR("A", "Air"),
-    SEA("S", "Sea"),
-    TRAIL("T", "Trail"),
-    ROAD("R", "Road");
+    AIR("A"),
+    SEA("S"),
+    TRAIL("T"),
+    ROAD("R");
 
     private final String code;
-    private final String name;
 
     @JsonValue
     public String getCode(){

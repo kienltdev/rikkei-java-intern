@@ -9,11 +9,10 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 public enum ProductType {
-    AIRCON("Aircon", "Air Conditioner"),
-    SPARE_PART("Spare_part", "Spare Part");
+    AIRCON("Aircon"),
+    SPARE_PART("Spare_part");
 
     private final String code;
-    private final String name;
 
     @JsonValue
     public String getCode() {

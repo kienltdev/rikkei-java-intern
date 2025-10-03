@@ -86,7 +86,8 @@ public class InboundServiceImpl implements InboundService {
                 });
 
         if (existingInbound.getStatus() != InboundStatus.NOT_OUTBOUND) {
-            String message = messageSource.getMessage("error.inbound.updateNotAllowed", new Object[]{existingInbound.getStatus().getName()}, LocaleContextHolder.getLocale());
+            String translatedStatusName = getTranslatedEnumName(existingInbound.getStatus());
+            String message = messageSource.getMessage("error.inbound.updateNotAllowed", new Object[]{translatedStatusName}, LocaleContextHolder.getLocale());
             throw new InvalidOperationException("UPDATE_NOT_ALLOWED", message);
         }
 
@@ -113,8 +114,9 @@ public class InboundServiceImpl implements InboundService {
                 });
 
         if(inboundToDelete.getStatus() != InboundStatus.NOT_OUTBOUND){
+            String translatedStatusName = getTranslatedEnumName(inboundToDelete.getStatus());
             String message = messageSource.getMessage("error.inbound.deleteNotAllowed",
-                    new Object[]{inboundToDelete.getStatus().getName()},
+                    new Object[]{translatedStatusName},
                     LocaleContextHolder.getLocale());
             throw new InvalidOperationException("DELETE_NOT_ALLOWED", message);
         }
@@ -161,5 +163,15 @@ public class InboundServiceImpl implements InboundService {
         long quantityAvailable = inbound.getQuantity() - quantityOutBound;
         return inboundMapper.toInboundDetailResponse(inbound, quantityAvailable, outbounds);
     }
+
+    private <E extends Enum<E>> String getTranslatedEnumName(E enumConstant) {
+        if (enumConstant == null) {
+            return "";
+        }
+        String key = "enum." + enumConstant.getClass().getSimpleName() + "." + enumConstant.name();
+        return messageSource.getMessage(key, null, enumConstant.name(), LocaleContextHolder.getLocale());
+    }
 }
+
+
 

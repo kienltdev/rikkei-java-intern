@@ -9,13 +9,12 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 public enum InboundStatus {
-    NOT_OUTBOUND(0, "Not Outbound"),
-    PARTIALLY_OUTBOUND(1,  "Partially Outbound"),
-    FULLY_OUTBOUND(2,   "Fully Outbound");
+    NOT_OUTBOUND(0),
+    PARTIALLY_OUTBOUND(1),
+    FULLY_OUTBOUND(2);
 
 
     private final int code;
-    private final String name;
 
     @JsonValue
     public int getCode() {
