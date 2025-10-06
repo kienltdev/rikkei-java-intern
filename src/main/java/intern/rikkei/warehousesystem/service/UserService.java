@@ -1,8 +1,8 @@
 package intern.rikkei.warehousesystem.service;
 
-import intern.rikkei.warehousesystem.dto.request.RegisterRequest;
-import intern.rikkei.warehousesystem.dto.request.UpdateProfileRequest;
-import intern.rikkei.warehousesystem.dto.response.UserResponse;
+import intern.rikkei.warehousesystem.dto.auth.request.RegisterRequest;
+import intern.rikkei.warehousesystem.dto.auth.request.UpdateProfileRequest;
+import intern.rikkei.warehousesystem.dto.auth.response.UserResponse;
 
 public interface UserService {
     UserResponse register(RegisterRequest registerRequest);

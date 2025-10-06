@@ -1,8 +1,8 @@
 package intern.rikkei.warehousesystem.repository;
 
-import intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse;
-import intern.rikkei.warehousesystem.dto.response.InventoryDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.MonthlyQuantity;
+import intern.rikkei.warehousesystem.dto.inbound.response.InboundStatisticsResponse;
+import intern.rikkei.warehousesystem.dto.inventory.response.InventoryDetailResponse;
+import intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
@@ -33,7 +33,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
     Optional<Inbound> findByIdAndLock(@Param("id") Long id);
 
     @Query(value = """
-            SELECT new intern.rikkei.warehousesystem.dto.response.InboundStatisticsResponse(
+            SELECT new intern.rikkei.warehousesystem.dto.inbound.response.InboundStatisticsResponse(
                 i.productType,
                 i.supplierCd,
                 COALESCE(SUM(i.quantity), 0) ,
@@ -71,7 +71,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
 
     @Query(
             value = """
-                SELECT new intern.rikkei.warehousesystem.dto.response.InventoryDetailResponse(
+                SELECT new intern.rikkei.warehousesystem.dto.inventory.response.InventoryDetailResponse(
                     i.id,
                     i.invoice,
                     i.productType,
@@ -113,7 +113,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
 //    @Query("SELECT COALESCE(SUM(i.quantity), 0L) FROM Inbound i WHERE i.receiveDate >= :startDate AND i.receiveDate <= :endDate")
 //    Long sumQuantityByReceiveDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     @Query("""
-            SELECT new intern.rikkei.warehousesystem.dto.response.MonthlyQuantity(MONTH(i.receiveDate), SUM(i.quantity))
+            SELECT new intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity(MONTH(i.receiveDate), SUM(i.quantity))
             FROM Inbound i
             WHERE YEAR(i.receiveDate) = :year
             GROUP BY MONTH(i.receiveDate)

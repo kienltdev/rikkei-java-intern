@@ -1,11 +1,11 @@
 package intern.rikkei.warehousesystem.controller;
 
-import intern.rikkei.warehousesystem.dto.request.OutboundRequest;
-import intern.rikkei.warehousesystem.dto.request.OutboundSearchRequest;
-import intern.rikkei.warehousesystem.dto.request.UpdateOutboundRequest;
-import intern.rikkei.warehousesystem.dto.response.OutboundDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.OutboundResponse;
-import intern.rikkei.warehousesystem.dto.response.PaginatedResponse;
+import intern.rikkei.warehousesystem.dto.outbound.request.OutboundRequest;
+import intern.rikkei.warehousesystem.dto.outbound.request.OutboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.outbound.request.UpdateOutboundRequest;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundResponse;
+import intern.rikkei.warehousesystem.dto.common.PaginatedResponse;
 import intern.rikkei.warehousesystem.service.OutboundService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

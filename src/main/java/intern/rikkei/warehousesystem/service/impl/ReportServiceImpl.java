@@ -1,8 +1,8 @@
 package intern.rikkei.warehousesystem.service.impl;
 
-import intern.rikkei.warehousesystem.dto.response.MonthlyInventoryReportResponse;
-import intern.rikkei.warehousesystem.dto.response.MonthlyQuantity;
-import intern.rikkei.warehousesystem.dto.response.MonthlyReportDetail;
+import intern.rikkei.warehousesystem.dto.report.response.MonthlyInventoryReportResponse;
+import intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity;
+import intern.rikkei.warehousesystem.dto.report.response.MonthlyReportDetail;
 import intern.rikkei.warehousesystem.repository.InboundRepository;
 import intern.rikkei.warehousesystem.repository.OutboundRepository;
 import intern.rikkei.warehousesystem.service.ReportService;

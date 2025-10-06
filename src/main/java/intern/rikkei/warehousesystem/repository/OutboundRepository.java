@@ -1,6 +1,6 @@
 package intern.rikkei.warehousesystem.repository;
 
-import intern.rikkei.warehousesystem.dto.response.MonthlyQuantity;
+import intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity;
 import intern.rikkei.warehousesystem.entity.Outbound;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
@@ -42,7 +42,7 @@ public interface OutboundRepository extends JpaRepository<Outbound, Long>, JpaSp
     //    @Query("SELECT COALESCE(SUM(o.quantity), 0L) FROM Outbound o WHERE o.shippingDate >= :startDate AND o.shippingDate <= :endDate")
 //    Long sumQuantityByShippingDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     @Query("""
-            SELECT new intern.rikkei.warehousesystem.dto.response.MonthlyQuantity(
+            SELECT new intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity(
                  MONTH(o.shippingDate),
                  COALESCE(SUM(o.quantity), 0L)
             )

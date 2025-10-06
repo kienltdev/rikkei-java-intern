@@ -1,8 +1,8 @@
 package intern.rikkei.warehousesystem.controller;
 
-import intern.rikkei.warehousesystem.dto.request.RegisterRequest;
-import intern.rikkei.warehousesystem.dto.request.UpdateProfileRequest;
-import intern.rikkei.warehousesystem.dto.response.UserResponse;
+import intern.rikkei.warehousesystem.dto.auth.request.RegisterRequest;
+import intern.rikkei.warehousesystem.dto.auth.request.UpdateProfileRequest;
+import intern.rikkei.warehousesystem.dto.auth.response.UserResponse;
 import intern.rikkei.warehousesystem.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package intern.rikkei.warehousesystem.controller;
 
-import intern.rikkei.warehousesystem.dto.response.DictionaryResponseDTO;
+import intern.rikkei.warehousesystem.dto.common.DictionaryResponseDTO;
 import intern.rikkei.warehousesystem.service.DictionaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

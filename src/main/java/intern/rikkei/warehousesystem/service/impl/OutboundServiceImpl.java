@@ -1,10 +1,10 @@
 package intern.rikkei.warehousesystem.service.impl;
 
-import intern.rikkei.warehousesystem.dto.request.OutboundRequest;
-import intern.rikkei.warehousesystem.dto.request.OutboundSearchRequest;
-import intern.rikkei.warehousesystem.dto.request.UpdateOutboundRequest;
-import intern.rikkei.warehousesystem.dto.response.OutboundDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.OutboundResponse;
+import intern.rikkei.warehousesystem.dto.outbound.request.OutboundRequest;
+import intern.rikkei.warehousesystem.dto.outbound.request.OutboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.outbound.request.UpdateOutboundRequest;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Outbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;

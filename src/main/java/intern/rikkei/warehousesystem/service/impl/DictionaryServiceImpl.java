@@ -1,7 +1,7 @@
 package intern.rikkei.warehousesystem.service.impl;
 
-import intern.rikkei.warehousesystem.dto.response.DictionaryItemDTO;
-import intern.rikkei.warehousesystem.dto.response.DictionaryResponseDTO;
+import intern.rikkei.warehousesystem.dto.common.DictionaryItemDTO;
+import intern.rikkei.warehousesystem.dto.common.DictionaryResponseDTO;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.ShippingMethod;

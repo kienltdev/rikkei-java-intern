@@ -1,9 +1,9 @@
 package intern.rikkei.warehousesystem.service.impl;
 
-import intern.rikkei.warehousesystem.dto.request.InventoryListRequest;
-import intern.rikkei.warehousesystem.dto.request.InventorySearchRequest;
-import intern.rikkei.warehousesystem.dto.response.InventoryDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.InventorySummaryResponse;
+import intern.rikkei.warehousesystem.dto.inventory.request.InventoryListRequest;
+import intern.rikkei.warehousesystem.dto.inventory.request.InventorySearchRequest;
+import intern.rikkei.warehousesystem.dto.inventory.response.InventoryDetailResponse;
+import intern.rikkei.warehousesystem.dto.inventory.response.InventorySummaryResponse;
 import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
 import intern.rikkei.warehousesystem.repository.InboundRepository;

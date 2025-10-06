@@ -1,10 +1,10 @@
 package intern.rikkei.warehousesystem.controller;
 
-import intern.rikkei.warehousesystem.dto.request.InventoryListRequest;
-import intern.rikkei.warehousesystem.dto.request.InventorySearchRequest;
-import intern.rikkei.warehousesystem.dto.response.InventoryDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.InventorySummaryResponse;
-import intern.rikkei.warehousesystem.dto.response.PaginatedResponse;
+import intern.rikkei.warehousesystem.dto.inventory.request.InventoryListRequest;
+import intern.rikkei.warehousesystem.dto.inventory.request.InventorySearchRequest;
+import intern.rikkei.warehousesystem.dto.inventory.response.InventoryDetailResponse;
+import intern.rikkei.warehousesystem.dto.inventory.response.InventorySummaryResponse;
+import intern.rikkei.warehousesystem.dto.common.PaginatedResponse;
 import intern.rikkei.warehousesystem.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

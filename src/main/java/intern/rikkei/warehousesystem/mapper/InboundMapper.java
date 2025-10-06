@@ -1,10 +1,10 @@
 package intern.rikkei.warehousesystem.mapper;
 
-import intern.rikkei.warehousesystem.dto.request.InboundImportRowDTO;
-import intern.rikkei.warehousesystem.dto.request.InboundRequest;
-import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
-import intern.rikkei.warehousesystem.dto.response.InboundDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.InboundResponse;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundImportRowDTO;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundRequest;
+import intern.rikkei.warehousesystem.dto.inbound.request.UpdateInboundRequest;
+import intern.rikkei.warehousesystem.dto.inbound.response.InboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.inbound.response.InboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Outbound;
 import intern.rikkei.warehousesystem.enums.InboundStatus;

@@ -1,10 +1,10 @@
 package intern.rikkei.warehousesystem.mapper;
 
-import intern.rikkei.warehousesystem.dto.request.UpdateOutboundRequest;
-import intern.rikkei.warehousesystem.dto.response.InboundSummaryResponse;
-import intern.rikkei.warehousesystem.dto.response.OutboundDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.OutboundResponse;
-import intern.rikkei.warehousesystem.dto.response.OutboundSummaryResponse;
+import intern.rikkei.warehousesystem.dto.outbound.request.UpdateOutboundRequest;
+import intern.rikkei.warehousesystem.dto.inbound.response.InboundSummaryResponse;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundResponse;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundSummaryResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Outbound;
 import intern.rikkei.warehousesystem.enums.ShippingMethod;

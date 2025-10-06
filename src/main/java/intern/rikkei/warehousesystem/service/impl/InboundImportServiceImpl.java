@@ -1,8 +1,8 @@
 package intern.rikkei.warehousesystem.service.impl;
 
-import intern.rikkei.warehousesystem.dto.request.InboundImportRowDTO;
-import intern.rikkei.warehousesystem.dto.response.ImportErrorDetail;
-import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundImportRowDTO;
+import intern.rikkei.warehousesystem.dto.inbound.response.ImportErrorDetail;
+import intern.rikkei.warehousesystem.dto.inbound.response.ImportResultResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import intern.rikkei.warehousesystem.mapper.InboundMapper;

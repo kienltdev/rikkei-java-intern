@@ -1,13 +1,13 @@
 package intern.rikkei.warehousesystem.service;
 
-import intern.rikkei.warehousesystem.dto.request.InboundRequest;
-import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
-import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
-import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
-import intern.rikkei.warehousesystem.dto.response.ImportResultResponse;
-import intern.rikkei.warehousesystem.dto.response.InboundDetailResponse;
-import intern.rikkei.warehousesystem.dto.response.InboundResponse;
-import intern.rikkei.warehousesystem.dto.response.PaginatedInboundStatisticsResponse;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundRequest;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundStatisticsRequest;
+import intern.rikkei.warehousesystem.dto.inbound.request.UpdateInboundRequest;
+import intern.rikkei.warehousesystem.dto.inbound.response.ImportResultResponse;
+import intern.rikkei.warehousesystem.dto.inbound.response.InboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.inbound.response.InboundResponse;
+import intern.rikkei.warehousesystem.dto.inbound.response.PaginatedInboundStatisticsResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,6 +1,6 @@
 package intern.rikkei.warehousesystem.service;
 
-import intern.rikkei.warehousesystem.dto.response.DictionaryResponseDTO;
+import intern.rikkei.warehousesystem.dto.common.DictionaryResponseDTO;
 
 public interface DictionaryService {
     DictionaryResponseDTO getProductTypes();

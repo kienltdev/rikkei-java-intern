@@ -1,9 +1,9 @@
 package intern.rikkei.warehousesystem.service.impl;
 
 import intern.rikkei.warehousesystem.constant.ErrorCodes;
-import intern.rikkei.warehousesystem.dto.request.RegisterRequest;
-import intern.rikkei.warehousesystem.dto.request.UpdateProfileRequest;
-import intern.rikkei.warehousesystem.dto.response.UserResponse;
+import intern.rikkei.warehousesystem.dto.auth.request.RegisterRequest;
+import intern.rikkei.warehousesystem.dto.auth.request.UpdateProfileRequest;
+import intern.rikkei.warehousesystem.dto.auth.response.UserResponse;
 import intern.rikkei.warehousesystem.entity.User;
 import intern.rikkei.warehousesystem.enums.Role;
 import intern.rikkei.warehousesystem.exception.DuplicateResourceException;

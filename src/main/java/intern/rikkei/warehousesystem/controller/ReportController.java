@@ -1,6 +1,6 @@
 package intern.rikkei.warehousesystem.controller;
 
-import intern.rikkei.warehousesystem.dto.response.MonthlyInventoryReportResponse;
+import intern.rikkei.warehousesystem.dto.report.response.MonthlyInventoryReportResponse;
 import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import intern.rikkei.warehousesystem.service.ReportService;
 import jakarta.validation.constraints.Min;

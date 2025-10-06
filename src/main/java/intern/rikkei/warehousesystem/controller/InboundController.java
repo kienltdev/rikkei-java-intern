@@ -1,10 +1,14 @@
 package intern.rikkei.warehousesystem.controller;
 
-import intern.rikkei.warehousesystem.dto.request.InboundRequest;
-import intern.rikkei.warehousesystem.dto.request.InboundSearchRequest;
-import intern.rikkei.warehousesystem.dto.request.InboundStatisticsRequest;
-import intern.rikkei.warehousesystem.dto.request.UpdateInboundRequest;
-import intern.rikkei.warehousesystem.dto.response.*;
+import intern.rikkei.warehousesystem.dto.common.PaginatedResponse;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundRequest;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundSearchRequest;
+import intern.rikkei.warehousesystem.dto.inbound.request.InboundStatisticsRequest;
+import intern.rikkei.warehousesystem.dto.inbound.request.UpdateInboundRequest;
+import intern.rikkei.warehousesystem.dto.inbound.response.ImportResultResponse;
+import intern.rikkei.warehousesystem.dto.inbound.response.InboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.inbound.response.InboundResponse;
+import intern.rikkei.warehousesystem.dto.inbound.response.PaginatedInboundStatisticsResponse;
 import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import intern.rikkei.warehousesystem.service.InboundService;
 import jakarta.validation.Valid;
