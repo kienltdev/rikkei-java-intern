@@ -118,8 +118,14 @@ public class OutboundServiceImpl implements OutboundService {
         Integer oldQuantity = Optional.ofNullable(outbound.getQuantity()).orElse(0);
         Integer newQuantity = request.quantity();
         boolean quantityChanged = (newQuantity != null) && !Objects.equals(oldQuantity, newQuantity);
+        Inbound inbound = outbound.getInbound();
         if(quantityChanged){
-            Inbound inbound = outbound.getInbound();
+            inboundRepository.findByIdAndLock(inbound.getId())
+                    .orElseThrow(() -> {
+                        String message = messageSource.getMessage("error.inbound.notFound", new Object[]{inbound.getId()},
+                                LocaleContextHolder.getLocale());
+                        return new ResourceNotFoundException("INBOUND_NOT_FOUND", message);
+                    });
             Long totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
             long availableQuantity = inbound.getQuantity() - (totalShipped - oldQuantity);
                 if(newQuantity > availableQuantity){
@@ -134,7 +140,6 @@ public class OutboundServiceImpl implements OutboundService {
         Outbound savedOutbound = outboundRepository.save(outbound);
 
         if(quantityChanged){
-            Inbound inbound = outbound.getInbound();
             Integer totalQuantity = Optional.ofNullable(inbound.getQuantity()).orElse(0);
             Long newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
             if(newTotalShipped <= 0){
@@ -166,6 +171,12 @@ public class OutboundServiceImpl implements OutboundService {
             throw new InvalidOperationException("OUTBOUND_DELETE_NOT_ALLOWED", message);
         }
         Inbound inbound = outbound.getInbound();
+        inboundRepository.findByIdAndLock(inbound.getId())
+                .orElseThrow(() -> {
+                    String message = messageSource.getMessage("error.inbound.notFound", new Object[]{inbound.getId()},
+                            LocaleContextHolder.getLocale());
+                    return new ResourceNotFoundException("INBOUND_NOT_FOUND", message);
+                });
         outboundRepository.delete(outbound);
 
         Long newTotalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());

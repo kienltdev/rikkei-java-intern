@@ -94,7 +94,10 @@ public class InboundImportServiceImpl implements InboundImportService {
         try {
             return parser.parse(file);
         } catch (IOException e) {
-            throw new InvalidOperationException("FILE_READ_ERROR", "Failed to read the file: " + e.getMessage());
+            String message = messageSource.getMessage("error.file.readFailed",
+                    new Object[]{e.getMessage()},
+                    LocaleContextHolder.getLocale());
+            throw new InvalidOperationException("FILE_READ_ERROR", message);
         }
     }
 
