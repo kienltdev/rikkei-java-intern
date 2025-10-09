@@ -13,6 +13,7 @@ import intern.rikkei.warehousesystem.repository.UserRepository;
 import intern.rikkei.warehousesystem.service.UserCacheService;
 import intern.rikkei.warehousesystem.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -60,9 +61,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "users", key = "#username")
     public UserResponse updateProfile(String username, UpdateProfileRequest updateProfileRequest) {
-        userCacheService.evictUserFromCache(username);
-
         Locale locale = LocaleContextHolder.getLocale();
         String userNotFoundMessage = messageSource.getMessage("error.user.notFound", new Object[]{username}, locale);
         User user = userRepository.findByUsername(username)

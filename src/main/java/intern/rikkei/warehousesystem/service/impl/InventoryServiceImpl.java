@@ -25,8 +25,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional(readOnly = true)
     @Override
     public InventorySummaryResponse getInventorySummary(InventorySearchRequest request) {
-        ProductType productType = StringUtils.hasText(request.productType()) ? ProductType.valueOf(request.productType().toUpperCase()) : null;
-        SupplierCd supplierCd = StringUtils.hasText(request.supplierCd()) ? SupplierCd.valueOf(request.supplierCd().toUpperCase()) : null;
+        ProductType productType = StringUtils.hasText(request.productType()) ? ProductType.fromCode(request.productType()) : null;
+        SupplierCd supplierCd = StringUtils.hasText(request.supplierCd()) ? SupplierCd.fromCode(request.supplierCd()) : null;
         String invoice = request.invoice();
 
         Long totalQuantityInbound = inboundRepository.sumQuantityByFilters(productType, supplierCd, invoice);

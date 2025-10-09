@@ -10,7 +10,7 @@ public record UpdateProfileRequest(
                 description = "Full name (max 100 chars). Optional field.",
                 example = "Le Trung Kien"
         )
-        @Size(min = 1, max = 100, message = "{validation.fullName.length}")
+        @Size(max = 100, message = "{validation.fullName.length}")
         String fullName,
 
         @Schema(

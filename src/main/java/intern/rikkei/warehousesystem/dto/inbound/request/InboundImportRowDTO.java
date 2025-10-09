@@ -30,7 +30,7 @@ public record InboundImportRowDTO(
         Integer quantity,
 
         @Schema(description = "Receive date as a string from the import file. Expected format: dd/MM/yyyy", example = "25/12/2024")
-        @Pattern(regexp = "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/\\d{4}$", message = "Invalid date format. Please use dd/MM/yyyy")
+        @Pattern(regexp = "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/\\d{4}$", message = "{validation.date.format.dmy}")
         String receiveDate
 ) {
 }

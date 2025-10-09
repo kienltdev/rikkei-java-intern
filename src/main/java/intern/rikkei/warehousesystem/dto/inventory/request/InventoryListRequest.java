@@ -12,7 +12,6 @@ public record InventoryListRequest(
         @Positive(message = "{validation.inboundId.positive}")
         Long inbId,
         @Parameter(description = "Filter by invoice number (supports partial matching).", example = "456")
-        @Pattern(regexp = "^[0-9]{9}$", message = "{validation.invoice.format}")
         String invoice,
         @Parameter(description = "Filter by product type (e.g., 'Aircon', 'Spare_part'). Case-insensitive.", example = "Spare_part")
         @ValidEnum(enumClass = ProductType.class, message = "{validation.productType.invalid}", ignoreCase = true)
