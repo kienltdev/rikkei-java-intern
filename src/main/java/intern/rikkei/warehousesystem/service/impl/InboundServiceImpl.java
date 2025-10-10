@@ -68,7 +68,8 @@ public class InboundServiceImpl implements InboundService {
 
         Specification<Inbound> spec = InboundSpecification.filterBy(
                 productType,
-                supplierCd
+                supplierCd,
+                request.getInvoice()
         );
 
         Page<Inbound> inboundPage = inboundRepository.findAll(spec, pageable);
