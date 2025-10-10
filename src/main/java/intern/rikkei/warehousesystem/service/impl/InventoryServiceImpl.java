@@ -48,7 +48,6 @@ public class InventoryServiceImpl implements InventoryService {
 
 
         return inboundRepository.findInventoryDetails(
-                request.inbId(),
                 request.invoice(),
                 productType,
                 supplierCd,

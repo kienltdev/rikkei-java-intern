@@ -4,6 +4,7 @@ import intern.rikkei.warehousesystem.dto.outbound.request.OutboundRequest;
 import intern.rikkei.warehousesystem.dto.outbound.request.OutboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.outbound.request.UpdateOutboundRequest;
 import intern.rikkei.warehousesystem.dto.outbound.response.OutboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundListResponse;
 import intern.rikkei.warehousesystem.dto.outbound.response.OutboundResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
 import intern.rikkei.warehousesystem.entity.Outbound;
@@ -37,9 +38,9 @@ public class OutboundServiceImpl implements OutboundService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<OutboundResponse> findAll(OutboundSearchRequest request, Pageable pageable){
+    public Page<OutboundListResponse> findAll(OutboundSearchRequest request, Pageable pageable){
         Page<Outbound>  outboundPage = outboundRepository.findAll(pageable);
-        return outboundPage.map(outboundMapper::toOutboundResponse);
+        return outboundPage.map(outboundMapper::toOutboundListResponse);
     }
 
     @Override
@@ -91,13 +92,7 @@ public class OutboundServiceImpl implements OutboundService {
                             LocaleContextHolder.getLocale());
                     return new ResourceNotFoundException("OUTBOUND_NOT_FOUND", message);
                 });
-        Inbound inbound = outbound.getInbound();
-        Long totalShipped = outboundRepository.sumQuantityByInboundId(inbound.getId());
-        long availableQuantity = inbound.getQuantity() - totalShipped;
-
-       return outboundMapper.toOutboundDetailResponse(outbound, availableQuantity);
-
-
+       return outboundMapper.toOutboundDetailResponse(outbound);
     }
 
     @Override

@@ -82,8 +82,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
                 )
                 FROM Inbound i
                 LEFT JOIN Outbound o ON o.inbound.id = i.id
-                WHERE (:inbId IS NULL OR i.id = :inbId)
-                AND (:invoice IS NULL OR i.invoice LIKE :invoice%)
+                WHERE (:invoice IS NULL OR i.invoice LIKE :invoice%)
                 AND (:productType IS NULL OR i.productType = :productType)
                 AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
                 GROUP BY i.id, i.invoice, i.productType, i.supplierCd, i.quantity, i.status
@@ -92,14 +91,12 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
             countQuery = """
                 SELECT COUNT(i)
                 FROM Inbound i
-                WHERE (:inbId IS NULL OR i.id = :inbId)
-                AND (:invoice IS NULL OR i.invoice LIKE :invoice%)
+                WHERE (:invoice IS NULL OR i.invoice LIKE :invoice%)
                 AND (:productType IS NULL OR i.productType = :productType)
                 AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
                 """
     )
     Page<InventoryDetailResponse> findInventoryDetails(
-            @Param("inbId") Long inbId,
             @Param("invoice") String invoice,
             @Param("productType") ProductType productType,
             @Param("supplierCd") SupplierCd supplierCd,

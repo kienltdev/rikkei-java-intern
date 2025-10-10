@@ -5,6 +5,7 @@ import intern.rikkei.warehousesystem.dto.outbound.request.OutboundRequest;
 import intern.rikkei.warehousesystem.dto.outbound.request.OutboundSearchRequest;
 import intern.rikkei.warehousesystem.dto.outbound.request.UpdateOutboundRequest;
 import intern.rikkei.warehousesystem.dto.outbound.response.OutboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundListResponse;
 import intern.rikkei.warehousesystem.dto.outbound.response.OutboundResponse;
 import intern.rikkei.warehousesystem.exception.ApiErrorResponse;
 import intern.rikkei.warehousesystem.service.OutboundService;
@@ -42,12 +43,12 @@ public class OutboundController {
     })
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<PaginatedResponse<OutboundResponse>> getOutbounds(
+    public ResponseEntity<PaginatedResponse<OutboundListResponse>> getOutbounds(
             @Valid OutboundSearchRequest request,
             Pageable pageable
     ){
-        Page<OutboundResponse> outboundResponses = outboundService.findAll(request, pageable);
-        PaginatedResponse<OutboundResponse> response = new PaginatedResponse<>(
+        Page<OutboundListResponse> outboundResponses = outboundService.findAll(request, pageable);
+        PaginatedResponse<OutboundListResponse> response = new PaginatedResponse<>(
                 outboundResponses.getContent(),
                 outboundResponses.getNumber() + 1,
                 outboundResponses.getSize(),

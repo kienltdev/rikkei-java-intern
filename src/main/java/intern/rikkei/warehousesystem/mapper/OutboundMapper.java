@@ -1,8 +1,9 @@
 package intern.rikkei.warehousesystem.mapper;
 
-import intern.rikkei.warehousesystem.dto.outbound.request.UpdateOutboundRequest;
 import intern.rikkei.warehousesystem.dto.inbound.response.InboundSummaryResponse;
+import intern.rikkei.warehousesystem.dto.outbound.request.UpdateOutboundRequest;
 import intern.rikkei.warehousesystem.dto.outbound.response.OutboundDetailResponse;
+import intern.rikkei.warehousesystem.dto.outbound.response.OutboundListResponse;
 import intern.rikkei.warehousesystem.dto.outbound.response.OutboundResponse;
 import intern.rikkei.warehousesystem.dto.outbound.response.OutboundSummaryResponse;
 import intern.rikkei.warehousesystem.entity.Inbound;
@@ -20,9 +21,14 @@ public interface OutboundMapper {
     @Mapping(source = "shippingDate", target = "editable", qualifiedByName = "isEditable")
     OutboundResponse toOutboundResponse(Outbound outbound);
 
-    @Mapping(source = "outbound.inbound", target = "inboundSummary")
-    @Mapping(source = "outbound.shippingDate", target = "editable", qualifiedByName = "isEditable")
-    OutboundDetailResponse  toOutboundDetailResponse(Outbound outbound, @Context Long quantityAvailable);
+    @Mapping(source = "inbound.id", target = "inbId")
+    @Mapping(source = "inbound.invoice", target = "invoice")
+    @Mapping(source = "inbound.productType", target = "productType")
+    @Mapping(source = "shippingDate", target = "editable", qualifiedByName = "isEditable")
+    OutboundListResponse toOutboundListResponse(Outbound outbound);
+
+    @Mapping(source = "shippingDate", target = "editable", qualifiedByName = "isEditable")
+    OutboundDetailResponse toOutboundDetailResponse(Outbound outbound);
 
 
     @Mapping(target = "totalQuantity", source = "quantity")
