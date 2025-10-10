@@ -1,5 +1,6 @@
 package intern.rikkei.warehousesystem.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,11 @@ public enum SupplierCd {
     TIMOR_LESTE("TL");
 
     private final String code;
+
+    @JsonValue
+    public String getCode() {
+        return code;
+    }
 
     public static SupplierCd fromCode(String code) {
         if (code == null) {

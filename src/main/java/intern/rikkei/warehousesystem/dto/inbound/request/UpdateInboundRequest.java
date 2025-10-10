@@ -5,6 +5,7 @@ import intern.rikkei.warehousesystem.enums.ProductType;
 import intern.rikkei.warehousesystem.enums.SupplierCd;
 import intern.rikkei.warehousesystem.validation.annotation.ValidEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
@@ -40,8 +41,14 @@ public record UpdateInboundRequest(
         @PastOrPresent(message = "{validation.receiveDate.pastOrPresent}")
         LocalDate receiveDate,
 
-        @Schema(description = "New quantity. Must be a positive integer.", example = "150")
+        @Schema(
+                description = "Quantity of the product received. Must be between 1 and 100,000.",
+                example = "100",
+                minimum = "1",
+                maximum = "1000000"
+        )
         @Positive(message = "{validation.quantity.positive}")
+        @Max(value = 1000000, message = "{validation.quantity.max}")
         Integer quantity
 
 ) {

@@ -1,10 +1,13 @@
 package intern.rikkei.warehousesystem.service.parser;
 
 
+import intern.rikkei.warehousesystem.exception.InvalidOperationException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +21,11 @@ import java.util.List;
 
 @Component
 public class CsvParserStrategy implements FileParserStrategy {
+    private final MessageSource messageSource;
+
+    public CsvParserStrategy(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @Override
     public List<InboundData> parse(MultipartFile file) throws IOException {
@@ -41,17 +49,22 @@ public class CsvParserStrategy implements FileParserStrategy {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(bomInputStream, StandardCharsets.UTF_8));
                 CSVParser csvParser = new CSVParser(reader, customFormat)
         ) {
-            for (CSVRecord csvRecord : csvParser) {
-                if (csvRecord.isConsistent() && !isRecordEmpty(csvRecord)) {
-                    InboundData data = new InboundData(
-                            csvRecord.get("Supplier Country"),
-                            csvRecord.get("Invoice"),
-                            csvRecord.get("Product type"),
-                            csvRecord.get("Quantity"),
-                            csvRecord.get("Receive date")
-                    );
-                    dataList.add(data);
+            try {
+                for (CSVRecord csvRecord : csvParser) {
+                    if (csvRecord.isConsistent() && !isRecordEmpty(csvRecord)) {
+                        InboundData data = new InboundData(
+                                csvRecord.get("Supplier Country"),
+                                csvRecord.get("Invoice"),
+                                csvRecord.get("Product type"),
+                                csvRecord.get("Quantity"),
+                                csvRecord.get("Receive date")
+                        );
+                        dataList.add(data);
+                    }
                 }
+            } catch (IllegalArgumentException e) {
+                String message = messageSource.getMessage("error.file.csv.invalidHeader", null, LocaleContextHolder.getLocale());
+                throw new InvalidOperationException("INVALID_CSV_HEADER", message);
             }
         }
         return dataList;

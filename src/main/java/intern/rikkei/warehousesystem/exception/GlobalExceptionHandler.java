@@ -7,6 +7,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.util.unit.DataSize;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.Instant;
 import java.util.List;
@@ -35,7 +38,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
     private final MessageSource messageSource;
-
+    private final MultipartProperties multipartProperties;
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
@@ -76,7 +79,7 @@ public class GlobalExceptionHandler {
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .timestamp(Instant.now())
                 .status(HttpStatus.BAD_REQUEST.value())
-                .code(ErrorCodes.VALIDATION_ERROR)
+                .code(ErrorCodes.INVALID_PARAMETER_FORMAT)
                 .message(message)
                 .path(request.getRequestURI())
                 .build();
@@ -148,7 +151,7 @@ public class GlobalExceptionHandler {
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .timestamp(Instant.now())
                 .status(HttpStatus.BAD_REQUEST.value())
-                .code(ErrorCodes.VALIDATION_ERROR)
+                .code(ErrorCodes.MALFORMED_REQUEST_BODY)
                 .message(message)
                 .path(request.getRequestURI())
                 .build();
@@ -197,11 +200,32 @@ public class GlobalExceptionHandler {
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .timestamp(Instant.now())
                 .status(HttpStatus.BAD_REQUEST.value())
-                .code(ErrorCodes.VALIDATION_ERROR)
+                .code(ErrorCodes.MISSING_REQUIRED_PARAMETER)
                 .message(message)
                 .path(request.getRequestURI())
                 .build();
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        log.error("[ERROR] {}", request.getRequestURI(), ex);
+        Locale locale = LocaleContextHolder.getLocale();
+        DataSize maxFileSize = multipartProperties.getMaxFileSize();
+        String maxUploadSizeDisplay = (maxFileSize != null && !maxFileSize.isNegative())
+                ? maxFileSize.toMegabytes() + "MB"
+                : "N/A";
+        String message = messageSource.getMessage("error.file.size.exceeded", new Object[]{maxUploadSizeDisplay}, locale);
+
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.PAYLOAD_TOO_LARGE.value()) // Dùng mã lỗi 413 cho trường hợp này
+                .code("FILE_SIZE_EXCEEDED") // Tạo một mã lỗi mới
+                .message(message)
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.PAYLOAD_TOO_LARGE);
     }
 
     private ErrorDetail createErrorDetail(ObjectError error) {
