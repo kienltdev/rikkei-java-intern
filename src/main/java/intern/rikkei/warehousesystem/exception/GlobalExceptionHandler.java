@@ -131,8 +131,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
-        String message = "The request body is malformed or contains invalid data.";
-        String specificCause = "";
+        Locale locale = LocaleContextHolder.getLocale();
+        String message = messageSource.getMessage("error.requestBody.malformed", null, locale);
 
         Throwable cause = ex.getCause();
         if (cause instanceof InvalidFormatException ifx) {
@@ -141,11 +141,10 @@ public class GlobalExceptionHandler {
                     .collect(Collectors.joining("."));
 
             if (ifx.getTargetType() != null && (ifx.getTargetType().equals(Instant.class) || ifx.getTargetType().equals(java.util.Date.class))) {
-                specificCause = String.format("Field '%s' must be in ISO 8601 format (e.g., 'YYYY-MM-DDTHH:mm:ssZ').", fieldName);
+                message = messageSource.getMessage("error.requestBody.invalidDateFormat", new Object[]{fieldName}, locale);
             } else {
-                specificCause = String.format("Invalid value for field '%s'.", fieldName);
+                message = messageSource.getMessage("error.requestBody.invalidValue", new Object[]{fieldName}, locale);
             }
-            message = specificCause;
         }
 
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
@@ -219,8 +218,8 @@ public class GlobalExceptionHandler {
 
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .timestamp(Instant.now())
-                .status(HttpStatus.PAYLOAD_TOO_LARGE.value()) // Dùng mã lỗi 413 cho trường hợp này
-                .code("FILE_SIZE_EXCEEDED") // Tạo một mã lỗi mới
+                .status(HttpStatus.PAYLOAD_TOO_LARGE.value())
+                .code(ErrorCodes.FILE_SIZE_EXCEEDED)
                 .message(message)
                 .path(request.getRequestURI())
                 .build();

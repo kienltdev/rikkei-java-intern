@@ -1,6 +1,5 @@
 package intern.rikkei.warehousesystem.dto.inbound.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import intern.rikkei.warehousesystem.dto.outbound.response.OutboundSummaryResponse;
 import intern.rikkei.warehousesystem.enums.InboundStatus;
 import intern.rikkei.warehousesystem.enums.ProductType;
@@ -25,8 +24,7 @@ public record InboundDetailResponse(
         @Schema(description = "Supplier country code", implementation = SupplierCd.class, example = "VN")
         SupplierCd supplierCd,
 
-        @Schema(description = "Date goods were received (dd/MM/yyyy)", example = "25/12/2024")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        @Schema(description = "Date goods were received ISO 8601", example = "2024-12-22")
         LocalDate receiveDate,
 
         @Schema(description = "Current status of the inbound record", implementation = InboundStatus.class, example = "1")

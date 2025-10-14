@@ -60,16 +60,16 @@ public class InboundServiceImpl implements InboundService {
     @Transactional(readOnly = true)
     public Page<InboundResponse> findAll(InboundSearchRequest request, Pageable pageable) {
 
-        ProductType productType = StringUtils.hasText(request.getProductType()) ?
-                ProductType.valueOf(request.getProductType().toUpperCase()) : null;
+        ProductType productType = StringUtils.hasText(request.productType()) ?
+                ProductType.valueOf(request.productType().toUpperCase()) : null;
 
-        SupplierCd supplierCd = StringUtils.hasText(request.getSupplierCd()) ?
-                intern.rikkei.warehousesystem.enums.SupplierCd.fromCode(request.getSupplierCd().toUpperCase()) : null;
+        SupplierCd supplierCd = StringUtils.hasText(request.supplierCd()) ?
+                intern.rikkei.warehousesystem.enums.SupplierCd.fromCode(request.supplierCd().toUpperCase()) : null;
 
         Specification<Inbound> spec = InboundSpecification.filterBy(
                 productType,
                 supplierCd,
-                request.getInvoice()
+                request.invoice()
         );
 
         Page<Inbound> inboundPage = inboundRepository.findAll(spec, pageable);
@@ -129,11 +129,11 @@ public class InboundServiceImpl implements InboundService {
     @Transactional(readOnly = true)
     public PaginatedInboundStatisticsResponse getInboundStatistics(InboundStatisticsRequest request, Pageable pageable) {
 
-        ProductType productType = StringUtils.hasText(request.getProductType()) ?
-                ProductType.valueOf(request.getProductType().toUpperCase()) : null;
+        ProductType productType = StringUtils.hasText(request.productType()) ?
+                ProductType.valueOf(request.productType().toUpperCase()) : null;
 
-        SupplierCd supplierCd = StringUtils.hasText(request.getSupplierCd()) ?
-                SupplierCd.fromCode(request.getSupplierCd().toUpperCase()) : null;
+        SupplierCd supplierCd = StringUtils.hasText(request.supplierCd()) ?
+                SupplierCd.fromCode(request.supplierCd().toUpperCase()) : null;
 
         Page<InboundStatisticsResponse> statisticsPage = inboundRepository.findInboundStatistics(productType, supplierCd, pageable);
         Long grandTotalQuantity = inboundRepository.sumQuantityByFilters(productType, supplierCd, null);
