@@ -57,12 +57,12 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
     );
 
     @Query("""
-            SELECT COALESCE(SUM(i.quantity), 0L) 
-                        FROM Inbound i
-                                    WHERE (:productType IS NULL OR i.productType = :productType)
-                                                AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
-                                                            AND (:invoice IS NULL OR i.invoice = :invoice)
-            """)
+        SELECT SUM(i.quantity)
+        FROM Inbound i
+        WHERE (:productType IS NULL OR i.productType = :productType)
+          AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
+          AND (:invoice IS NULL OR i.invoice LIKE CONCAT(:invoice, '%'))
+        """)
     Long sumQuantityByFilters(
             @Param("productType") ProductType productType,
             @Param("supplierCd") SupplierCd supplierCd,
@@ -82,7 +82,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
                 )
                 FROM Inbound i
                 LEFT JOIN Outbound o ON o.inbound.id = i.id
-                WHERE (:invoice IS NULL OR i.invoice LIKE :invoice%)
+                WHERE (:invoice IS NULL OR i.invoice LIKE CONCAT(:invoice, '%'))
                 AND (:productType IS NULL OR i.productType = :productType)
                 AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
                 GROUP BY i.id, i.invoice, i.productType, i.supplierCd, i.quantity, i.status
@@ -91,7 +91,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
             countQuery = """
                 SELECT COUNT(i)
                 FROM Inbound i
-                WHERE (:invoice IS NULL OR i.invoice LIKE :invoice%)
+                WHERE (:invoice IS NULL OR i.invoice LIKE CONCAT(:invoice, '%'))
                 AND (:productType IS NULL OR i.productType = :productType)
                 AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
                 """
@@ -107,8 +107,6 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
     @Query("SELECT COALESCE(SUM(i.quantity), 0L) FROM Inbound i WHERE i.receiveDate < :date")
     Long sumQuantityByReceiveDateBefore(@Param("date") LocalDate date);
 
-//    @Query("SELECT COALESCE(SUM(i.quantity), 0L) FROM Inbound i WHERE i.receiveDate >= :startDate AND i.receiveDate <= :endDate")
-//    Long sumQuantityByReceiveDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     @Query("""
             SELECT new intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity(MONTH(i.receiveDate), SUM(i.quantity))
             FROM Inbound i

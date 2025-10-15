@@ -5,6 +5,7 @@ import intern.rikkei.warehousesystem.enums.SupplierCd;
 import intern.rikkei.warehousesystem.validation.annotation.ValidEnum;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public record InventorySearchRequest (
         @Parameter(description = "Filter by product type (e.g., 'Aircon', 'Spare_part'). Case-insensitive.", example = "Aircon")
@@ -15,8 +16,9 @@ public record InventorySearchRequest (
         @ValidEnum(enumClass = SupplierCd.class, message = "{validation.supplierCd.invalid}", ignoreCase = true)
         String supplierCd,
 
-        @Parameter(description = "Filter by a specific invoice number.", example = "123456789")
-        @Pattern(regexp = "^[0-9]{9}$", message = "{validation.invoice.format}")
+        @Parameter(description = "Filter by a specific invoice number.", example = "12345")
+        @Size(min = 1, max = 9, message = "{validation.search.invoice.length}")
+        @Pattern(regexp = "^[0-9]+$", message = "{validation.search.invoice.format}")
         String invoice
 ) {
 }

@@ -14,7 +14,6 @@ public final class ErrorCodes {
     public static final String MALFORMED_REQUEST_BODY = "MALFORMED_REQUEST_BODY";
     public static final String MISSING_REQUIRED_PARAMETER = "MISSING_REQUIRED_PARAMETER";
     public static final String FILE_SIZE_EXCEEDED = "FILE_SIZE_EXCEEDED";
-    public static final String INVALID_ENUM_VALUE = "INVALID_ENUM_VALUE";
     // Field Codes - Business
     public static final String USERNAME_ALREADY_EXISTS = "USERNAME_ALREADY_EXISTS";
     public static final String EMAIL_ALREADY_EXISTS = "EMAIL_ALREADY_EXISTS";

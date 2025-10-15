@@ -19,16 +19,16 @@ public interface OutboundRepository extends JpaRepository<Outbound, Long>, JpaSp
     List<Outbound> findByInboundId(Long inboundId);
 
     @Query("""
-                    SELECT COALESCE(SUM(o.quantity), 0L)
-                    FROM Outbound o
-                    WHERE o.inbound.id IN (
-                        SELECT i.id
-                        FROM Inbound i
-                        WHERE (:productType IS NULL OR i.productType = :productType)
-                        AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
-                        AND (:invoice IS NULL OR i.invoice = :invoice)
-                    )
-            """)
+        SELECT SUM(o.quantity)
+        FROM Outbound o
+        WHERE o.inbound.id IN (
+            SELECT i.id
+            FROM Inbound i
+            WHERE (:productType IS NULL OR i.productType = :productType)
+            AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
+            AND (:invoice IS NULL OR i.invoice LIKE CONCAT(:invoice, '%'))
+        )
+        """)
     Long sumQuantityByInboundFilter(
             @Param("productType") ProductType productType,
             @Param("supplierCd") SupplierCd supplierCd,
@@ -39,8 +39,6 @@ public interface OutboundRepository extends JpaRepository<Outbound, Long>, JpaSp
     @Query("SELECT COALESCE(SUM(o.quantity), 0L) FROM Outbound o WHERE o.shippingDate < :date")
     Long sumQuantityByShippingDateBefore(@Param("date") LocalDate date);
 
-    //    @Query("SELECT COALESCE(SUM(o.quantity), 0L) FROM Outbound o WHERE o.shippingDate >= :startDate AND o.shippingDate <= :endDate")
-//    Long sumQuantityByShippingDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     @Query("""
             SELECT new intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity(
                  MONTH(o.shippingDate),

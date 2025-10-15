@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class InventoryServiceImpl implements InventoryService {
@@ -29,8 +31,8 @@ public class InventoryServiceImpl implements InventoryService {
         SupplierCd supplierCd = StringUtils.hasText(request.supplierCd()) ? SupplierCd.fromCode(request.supplierCd()) : null;
         String invoice = request.invoice();
 
-        Long totalQuantityInbound = inboundRepository.sumQuantityByFilters(productType, supplierCd, invoice);
-        Long totalQuantityOutbound = outboundRepository.sumQuantityByInboundFilter(productType, supplierCd, invoice);
+        Long totalQuantityInbound = Optional.ofNullable(inboundRepository.sumQuantityByFilters(productType, supplierCd, invoice)).orElse(0L);
+        Long totalQuantityOutbound = Optional.ofNullable(outboundRepository.sumQuantityByInboundFilter(productType, supplierCd, invoice)).orElse(0L);
         Long totalQuantityAvailable = totalQuantityInbound - totalQuantityOutbound;
 
         return new InventorySummaryResponse(

@@ -55,7 +55,7 @@ public class ReportController {
             Integer year
     ) {
         if(year > Year.now().getValue()) {
-            String message = messageSource.getMessage("{validation.year.future}",
+            String message = messageSource.getMessage("validation.year.future",
                     new Object[]{year},
                     LocaleContextHolder.getLocale());
             throw new InvalidOperationException("INVALID_YEAR", message);
