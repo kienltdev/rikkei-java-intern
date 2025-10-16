@@ -19,7 +19,7 @@ public interface OutboundRepository extends JpaRepository<Outbound, Long>, JpaSp
     List<Outbound> findByInboundId(Long inboundId);
 
     @Query("""
-        SELECT SUM(o.quantity)
+        SELECT COALESCE(SUM(o.quantity), 0L)
         FROM Outbound o
         WHERE o.inbound.id IN (
             SELECT i.id

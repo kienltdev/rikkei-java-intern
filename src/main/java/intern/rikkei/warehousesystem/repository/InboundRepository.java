@@ -57,7 +57,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
     );
 
     @Query("""
-        SELECT SUM(i.quantity)
+        SELECT COALESCE(SUM(i.quantity), 0L)
         FROM Inbound i
         WHERE (:productType IS NULL OR i.productType = :productType)
           AND (:supplierCd IS NULL OR i.supplierCd = :supplierCd)
@@ -108,7 +108,7 @@ public interface InboundRepository extends JpaRepository<Inbound, Long>, JpaSpec
     Long sumQuantityByReceiveDateBefore(@Param("date") LocalDate date);
 
     @Query("""
-            SELECT new intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity(MONTH(i.receiveDate), SUM(i.quantity))
+            SELECT new intern.rikkei.warehousesystem.dto.report.response.MonthlyQuantity(MONTH(i.receiveDate), COALESCE(SUM(i.quantity), 0L))
             FROM Inbound i
             WHERE YEAR(i.receiveDate) = :year
             GROUP BY MONTH(i.receiveDate)
